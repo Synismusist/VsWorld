@@ -48,11 +48,12 @@ Extension of the X-Limit JI Autotuner module with a wavetable VCO to reduce floa
 
 # Images
 
-![grafik](https://github.com/user-attachments/assets/a2ae637b-88fc-4585-8ba4-7f581c7da074)
+![image](https://github.com/user-attachments/assets/01bec857-770c-4400-bad2-4a0b1ce062de)
 
-![grafik](https://github.com/user-attachments/assets/96e0c4da-04aa-4d0d-a5ff-acabbf2ce9eb)
+![image](https://github.com/user-attachments/assets/4cffd61c-d0e5-4cb2-bbae-cd3f695b852a)
 
-![image](https://github.com/user-attachments/assets/88adc9db-f16d-42bd-9015-52e0f6282496)
+![image](https://github.com/user-attachments/assets/a52b8812-b058-4591-9617-433d74923c83)
+
 
 # Parameter Examples
 
@@ -97,13 +98,4 @@ https://www.patreon.com/Aloboi/shop/alobend-only-available-for-logic-pro-x-74831
 # Patch examples
 ## Static just intonation (left channel) vs Dynamic just intonation (right channel)
 
-![image](https://github.com/user-attachments/assets/d3b34f5b-16be-472f-8fd4-0cc432df23f9)
-
-## Static just intonation (left channel) vs Dynamic just intonation (right channel) with VCOs
-
-![image](https://github.com/user-attachments/assets/1e4d8709-1d78-4368-951a-f9b024e5ccf8)
-
-
-
-
-
+![image](https://github.com/user-attachments/assets/4c48053f-c34a-4dd5-9912-f0e6550f5e48)
