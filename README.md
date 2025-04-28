@@ -44,7 +44,7 @@ The module initializes with 5-limit just intonation. The corresponding $(x_1,x_2
 For more information, check out this article from Felix Roos: https://loophole-letters.vercel.app/5limit-just-intonation
 
 ## X-Limit JI VCO
-Extension for the X-Limit JI Autotuner modules with a wavetable VCO to reduce floating point inaccuracies for minimal beating.
+VCO for the X-Limit JI Autotuner modules with a wavetable VCO to reduce floating point inaccuracies for minimal beating.
 
 # Images
 
