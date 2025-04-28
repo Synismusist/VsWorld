@@ -58,6 +58,7 @@ struct XLimitJIAutotuner2 : Module {
 	};
 	enum OutputId {
 		VOUT_OUTPUT,
+		VOUTRES_OUTPUT,
 		OUTPUTS_LEN
 	};
 	enum LightId {
@@ -99,7 +100,6 @@ struct XLimitJIAutotuner2 : Module {
 	double log213 = std::log2(13.0);
 	double log217 = std::log2(17.0);
 	double log219 = std::log2(19.0);
-
 
 	XLimitJIAutotuner2() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -202,9 +202,11 @@ struct XLimitJIAutotuner2 : Module {
 		lights[BOUNDS7_LIGHT].setBrightness(0.f);
 
 		configInput(VIN_INPUT, "V/Oct");
-		configOutput(VOUT_OUTPUT, "V/Oct");
+		configOutput(VOUT_OUTPUT, "V/Oct");		
+		configOutput(VOUTRES_OUTPUT, "V/Oct Residual");
 		
 		mAnglesUsed.reserve(16);
+		mVoltageList.reserve(1e7);
 
 	}
 	
@@ -444,17 +446,23 @@ struct XLimitJIAutotuner2 : Module {
 		int channels = std::max(1, inputs[VIN_INPUT].getChannels());
 
 		outputs[VOUT_OUTPUT].setChannels(channels);
+		outputs[VOUTRES_OUTPUT].setChannels(channels);
 		mAnglesUsed.resize(channels);
 		
 		double baseVoltage = inputs[VIN_INPUT].getPolyVoltage(0);
 		outputs[VOUT_OUTPUT].setVoltage(baseVoltage, 0);
+		outputs[VOUTRES_OUTPUT].setVoltage(0.f, 0);
 		mAnglesUsed[0] = 0.f;
 
 		for (int c = 1; c < channels; c++) {
 			double currVoltage = inputs[VIN_INPUT].getPolyVoltage(c);
 			double harmonicVoltage = findClosestInSorted(currVoltage - baseVoltage);
 			mAnglesUsed[c] = getFractionalPart(harmonicVoltage);
-			outputs[VOUT_OUTPUT].setVoltage(baseVoltage + harmonicVoltage, c);
+			double vout = baseVoltage + harmonicVoltage;
+			float voutF = static_cast<float>(vout);			
+			float voutR = vout - static_cast<double>(voutF);
+			outputs[VOUT_OUTPUT].setVoltage(voutF, c);
+			outputs[VOUTRES_OUTPUT].setVoltage(voutR, c);
 		}
 	
 	}
@@ -657,9 +665,10 @@ struct XLimitJIAutotuner2Widget : ModuleWidget {
 		addParam(createLightParamCentered<VCVLightLatch<SmallSimpleLight<WhiteLight>>>(mm2px(Vec(46.273, 77.133)), module, XLimitJIAutotuner2::BUT6_PARAM, XLimitJIAutotuner2::BUT6_LIGHT));
 		addParam(createLightParamCentered<VCVLightLatch<SmallSimpleLight<WhiteLight>>>(mm2px(Vec(46.273, 84.133)), module, XLimitJIAutotuner2::BUT7_PARAM, XLimitJIAutotuner2::BUT7_LIGHT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.133, 104.541)), module, XLimitJIAutotuner2::VIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.9305, 104.541)), module, XLimitJIAutotuner2::VIN_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(111.132, 104.541)), module, XLimitJIAutotuner2::VOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(111.132, 104.541)), module, XLimitJIAutotuner2::VOUT_OUTPUT));		
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(95.1325, 104.541)), module, XLimitJIAutotuner2::VOUTRES_OUTPUT));
 
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(74.232, 17.133)), module, XLimitJIAutotuner2::MONZO_LIGHT));
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(74.232, 35.133)), module, XLimitJIAutotuner2::BOUNDS0_LIGHT));

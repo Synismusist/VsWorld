@@ -14,17 +14,6 @@
   "changelogUrl": "",
   "modules": [
     {
-      "slug": "XLimitJIVCO",
-      "name": "X-Limit JI VCO",
-      "description": "VCO forcing just intonation",
-      "tags": [
-        "Polyphonic",
-        "Tuner",
-        "Quantizer",
-        "VCO"
-      ]
-    },
-    {
       "slug": "XLimitJIAutotuner",
       "name": "X-Limit JI Autotuner",
       "description": "Dynamic just intonation tuner",
@@ -42,6 +31,15 @@
         "Polyphonic",
         "Quantizer",
         "Tuner"
+      ]
+    },
+    {
+      "slug": "XLimitJIVCO",
+      "name": "X-Limit JI VCO",
+      "description": "",
+      "tags": [
+        "Polyphonic",
+        "VCO"
       ]
     }
   ]

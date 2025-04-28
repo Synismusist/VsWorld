@@ -20,7 +20,8 @@ struct XLimitJIAutotuner : Module {
 		INPUTS_LEN
 	};
 	enum OutputId {
-		SQR_OUTPUT,
+		VOUT_OUTPUT,
+		VOUTRES_OUTPUT,
 		OUTPUTS_LEN
 	};
 	enum LightId {
@@ -28,9 +29,15 @@ struct XLimitJIAutotuner : Module {
 		LIGHTS_LEN
 	};
 	
-	std::vector<double> voltageList;
-	std::vector<float> angles;
-	std::vector<float> anglesUsed;
+	std::vector<double> mVoltageList;
+	std::vector<float> mAngles;
+	std::vector<float> mAnglesUsed;
+
+	std::array<float, 8> mHistoricParams;
+	std::array<float, 8> mCurrParams;
+
+	std::array<int, 8> mVoltageSizeList;
+	int64_t mWantedVoltageListSize;
 
 	const double log22 = std::log2(2.0);
 	const double log23 = std::log2(3.0);
@@ -40,35 +47,6 @@ struct XLimitJIAutotuner : Module {
 	const double log213 = std::log2(13.0);
 	const double log217 = std::log2(17.0);
 	const double log219 = std::log2(19.0);
-
-	std::array<float, 8> historicPowers{
-		10.f, // 2
-		2.f, // 3
-		1.f, // 5
-		0.f, // 7
-		0.f, // 11
-		0.f, // 13
-		0.f, // 17
-		0.f // 19
-	};
-
-	template <typename T>
-	constexpr const T& clamp(const T& v, const T& lo, const T& hi) {
-    	return (v < lo) ? lo : (v > hi) ? hi : v;
-	}
-
-	bool powersChanged(float pow2, float pow3, float pow5, float pow7, float pow11, float pow13, float pow17, float pow19) {
-		bool hasChanged = false;
-		hasChanged |= historicPowers[0] != pow2;
-		hasChanged |= historicPowers[1] != pow3;
-		hasChanged |= historicPowers[2] != pow5;
-		hasChanged |= historicPowers[3] != pow7;
-		hasChanged |= historicPowers[4] != pow11;
-		hasChanged |= historicPowers[5] != pow13;
-		hasChanged |= historicPowers[6] != pow17;
-		hasChanged |= historicPowers[7] != pow19;
-		return hasChanged;
-	}
 
 	double modelFunD(double v, double x2, double x3, double x5 = 0.0, double x7 = 0.0, double x11 = 0.0, double x13 = 0.0, double x17 = 0.0, double x19 = 0.0) {
 		v += log22 * x2;
@@ -92,23 +70,27 @@ struct XLimitJIAutotuner : Module {
 		filtered.assign(lower, upper);
 	}
 
-	void buildList(float pow2, float pow3, float pow5, float pow7, float pow11, float pow13, float pow17, float pow19) {
-		int size2 = 2 * pow2 + 1;
-		int size3 = 2 * pow3 + 1;
-		int size5 = 2 * pow5 + 1;
-		int size7 = 2 * pow7 + 1;
-		int size11 = 2 * pow11 + 1;
-		int size13 = 2 * pow13 + 1;
-		int size17 = 2 * pow17 + 1;
-		int size19 = 2 * pow19 + 1;
+	void buildVoltageList(){
 
-		int voltageSize = size2 * size3 * size5 * size7 * size11 * size13 * size17 * size19;
+		mVoltageList.resize(mWantedVoltageListSize);
 
-		if(voltageSize > 1e7){
-			return;
-		}
-
-		voltageList.resize(voltageSize);
+		auto& size2 = mVoltageSizeList[0];
+		auto& size3 = mVoltageSizeList[1];
+		auto& size5 = mVoltageSizeList[2];
+		auto& size7 = mVoltageSizeList[3];
+		auto& size11 = mVoltageSizeList[4];
+		auto& size13 = mVoltageSizeList[5];
+		auto& size17 = mVoltageSizeList[6];
+		auto& size19 = mVoltageSizeList[7];
+		
+		int pow2 = -mCurrParams[0];
+		int pow3 = -mCurrParams[1];
+		int pow5 = -mCurrParams[2];
+		int pow7 =  -mCurrParams[3];
+		int pow11 = -mCurrParams[4];
+		int pow13 = -mCurrParams[5];
+		int pow17 = -mCurrParams[6];
+		int pow19 = -mCurrParams[7];
 
 		for(int i2 = 0; i2 < size2; i2++)
 			for(int i3 = 0; i3 < size3; i3++)
@@ -126,28 +108,17 @@ struct XLimitJIAutotuner : Module {
 										+ i13 * size2 * size3 * size5 * size7 * size11
 										+ i17 * size2 * size3 * size5 * size7 * size11 * size13
 										+ i19 * size2 * size3 * size5 * size7 * size11 * size13 * size17;
-										voltageList[idx] = modelFunD(0.0, -pow2 + i2, -pow3 + i3, -pow5 + i5, -pow7 + i7, -pow11 + i11, -pow13 + i13, -pow17 + i17, -pow19 + i19);
+										mVoltageList[idx] = modelFunD(0.0, pow2 + i2, pow3 + i3, pow5 + i5, pow7 + i7, pow11 + i11, pow13 + i13, pow17 + i17, pow19 + i19);
 									}
 
-		std::sort(voltageList.begin(), voltageList.end());
+		std::sort(mVoltageList.begin(), mVoltageList.end());
 
-		filterAngles(voltageList, angles, 0.f, 1.f);
-
-		historicPowers = {
-			pow2,
-			pow3,
-			pow5,
-			pow7,
-			pow11,
-			pow13,
-			pow17,
-			pow19,
-		};
-
+		filterAngles(mVoltageList, mAngles, 0.f, 1.f);	
+		
 	}
 
 	double findClosestInSorted(double target) {
-		auto& vec = voltageList;
+		auto& vec = mVoltageList;
 
 		auto lower = std::lower_bound(vec.begin(), vec.end(), target);
 	
@@ -165,96 +136,116 @@ struct XLimitJIAutotuner : Module {
 		// Subtrahiere die Ganzzahl-Komponente, um die Nachkommastellen zu erhalten
 		return value - std::floor(value); // Absolutwert für negative Zahlen
 	}
+	
+	void updateCurrentParams(){
+		mCurrParams[0] = params[POW2_PARAM].getValue();
+		mCurrParams[1] = params[POW3_PARAM].getValue();
+		mCurrParams[2] = params[POW5_PARAM].getValue();
+		mCurrParams[3] = params[POW7_PARAM].getValue();
+		mCurrParams[4] = params[POW11_PARAM].getValue();
+		mCurrParams[5] = params[POW13_PARAM].getValue();
+		mCurrParams[6] = params[POW17_PARAM].getValue();
+		mCurrParams[7] = params[POW19_PARAM].getValue();
+	}
+
+	void updateHistoricParams(){
+		mHistoricParams = mCurrParams;
+	}
+
+	void updateVoltageSizeList() {
+		for(int i = 0; i < 8; i++){
+			mVoltageSizeList[i] = 2 * mCurrParams[i] + 1;
+		}
+
+		int64_t sz = 1;
+		for(int i = 0; i < 8; i++){
+			sz *= mVoltageSizeList[i];
+			if(sz > 1e7){
+				break;
+			}
+		}
+		mWantedVoltageListSize = sz;
+	}
+
+	bool checkIfParamsChanged() {
+		return mCurrParams != mHistoricParams;
+	}
+
+	bool checkIfParamsValid() {
+		// check size of voltage list
+		updateVoltageSizeList();
+		bool sizeInvalid = mWantedVoltageListSize > 1e7;
+		lights[PATH1_LIGHT].setBrightness(sizeInvalid ? 1.f : 0.f);
+
+		return !sizeInvalid;
+	}
 
 	XLimitJIAutotuner() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
-		configParam(POW2_PARAM, 0.f, 20.f, historicPowers[0], "Pow2");
+		configParam(POW2_PARAM, 0.f, 20.f, 8.f, "Pow2");
 		paramQuantities[POW2_PARAM]->snapEnabled = true;
-		configParam(POW3_PARAM, 0.f, 20.f, historicPowers[1], "Pow3");
+		configParam(POW3_PARAM, 0.f, 20.f, 2.f, "Pow3");
 		paramQuantities[POW3_PARAM]->snapEnabled = true;
-		configParam(POW5_PARAM, 0.f, 20.f, historicPowers[2], "Pow5");
+		configParam(POW5_PARAM, 0.f, 20.f, 1.f, "Pow5");
 		paramQuantities[POW5_PARAM]->snapEnabled = true;
-		configParam(POW7_PARAM, 0.f, 20.f, historicPowers[3], "Pow7");
+		configParam(POW7_PARAM, 0.f, 20.f, 0.f, "Pow7");
 		paramQuantities[POW7_PARAM]->snapEnabled = true;
-		configParam(POW11_PARAM, 0.f, 20.f, historicPowers[4], "Pow11");
+		configParam(POW11_PARAM, 0.f, 20.f, 0.f, "Pow11");
 		paramQuantities[POW11_PARAM]->snapEnabled = true;
-		configParam(POW13_PARAM, 0.f, 20.f, historicPowers[5], "Pow13");
+		configParam(POW13_PARAM, 0.f, 20.f, 0.f, "Pow13");
 		paramQuantities[POW13_PARAM]->snapEnabled = true;
-		configParam(POW17_PARAM, 0.f, 20.f, historicPowers[6], "Pow17");
+		configParam(POW17_PARAM, 0.f, 20.f, 0.f, "Pow17");
 		paramQuantities[POW17_PARAM]->snapEnabled = true;
-		configParam(POW19_PARAM, 0.f, 20.f, historicPowers[7], "Pow19");
+		configParam(POW19_PARAM, 0.f, 20.f, 0.f, "Pow19");
 		paramQuantities[POW19_PARAM]->snapEnabled = true;
 
 		configInput(VOCT_INPUT, "V/Oct");
-		configOutput(SQR_OUTPUT, "V/Oct");
+		configOutput(VOUT_OUTPUT, "V/Oct");
+		configOutput(VOUTRES_OUTPUT, "V/Oct Residual");
 
-		configLight(PATH1_LIGHT, "Emergency stop");
+		configLight(PATH1_LIGHT, "Monzo overfill");
 
-		lights[PATH1_LIGHT].setBrightness(0.f);
-
-		voltageList.reserve(1e7);
-		anglesUsed.reserve(16);
-		
-		buildList(
-			params[POW2_PARAM].getValue(),
-			params[POW3_PARAM].getValue(),
-			params[POW5_PARAM].getValue(),
-			params[POW7_PARAM].getValue(),
-			params[POW11_PARAM].getValue(),
-			params[POW13_PARAM].getValue(),
-			params[POW17_PARAM].getValue(),
-			params[POW19_PARAM].getValue()
-		);
+		mVoltageList.reserve(1e7);
+		mAnglesUsed.resize(16);
 	}
 
 	void process(const ProcessArgs& args) override {
-		float pow2 = params[POW2_PARAM].getValue();
-		float pow3 = params[POW3_PARAM].getValue();
-		float pow5 = params[POW5_PARAM].getValue();
-		float pow7 = params[POW7_PARAM].getValue();
-		float pow11 = params[POW11_PARAM].getValue();
-		float pow13 = params[POW13_PARAM].getValue();
-		float pow17 = params[POW17_PARAM].getValue();
-		float pow19 = params[POW19_PARAM].getValue();
-		
-		int size2 = 2 * pow2 + 1;
-		int size3 = 2 * pow3 + 1;
-		int size5 = 2 * pow5 + 1;
-		int size7 = 2 * pow7 + 1;
-		int size11 = 2 * pow11 + 1;
-		int size13 = 2 * pow13 + 1;
-		int size17 = 2 * pow17 + 1;
-		int size19 = 2 * pow19 + 1;
 
-		int voltageSize = size2 * size3 * size5 * size7 * size11 * size13 * size17 * size19;
-
-		lights[PATH1_LIGHT].setBrightness(voltageSize > 1e7 ? 1.f : 0.f);	
-
-		if(powersChanged(pow2, pow3, pow5, pow7, pow11, pow13, pow17, pow19)){
-			buildList(pow2, pow3, pow5, pow7, pow11, pow13, pow17, pow19);
+		updateCurrentParams();
+		bool paramsValid = checkIfParamsValid();
+		bool paramsHasChanged = checkIfParamsChanged();
+		if(paramsHasChanged && paramsValid){
+			buildVoltageList();		
+			updateHistoricParams();	
 		}
 			
 		int channels = std::max(1, inputs[VOCT_INPUT].getChannels());
 
-		outputs[SQR_OUTPUT].setChannels(channels);
-		anglesUsed.resize(channels);
+		outputs[VOUT_OUTPUT].setChannels(channels);
+		outputs[VOUTRES_OUTPUT].setChannels(channels);
+		mAnglesUsed.resize(channels);
 		
 		double baseVoltage = inputs[VOCT_INPUT].getPolyVoltage(0);
-		outputs[SQR_OUTPUT].setVoltage(baseVoltage, 0);
-		anglesUsed[0] = 0.f;
+		outputs[VOUT_OUTPUT].setVoltage(baseVoltage, 0);
+		outputs[VOUTRES_OUTPUT].setVoltage(0.f, 0);
+		mAnglesUsed[0] = 0.f;
 
 		for (int c = 1; c < channels; c++) {
 			double currVoltage = inputs[VOCT_INPUT].getPolyVoltage(c);
 			double harmonicVoltage = findClosestInSorted(currVoltage - baseVoltage);
-			anglesUsed[c] = getFractionalPart(harmonicVoltage);
-			outputs[SQR_OUTPUT].setVoltage(baseVoltage + harmonicVoltage, c);
+			mAnglesUsed[c] = getFractionalPart(harmonicVoltage);
+			double vout = baseVoltage + harmonicVoltage;
+			float voutF = static_cast<float>(vout);			
+			float voutR = vout - static_cast<double>(voutF);
+			outputs[VOUT_OUTPUT].setVoltage(voutF, c);
+			outputs[VOUTRES_OUTPUT].setVoltage(voutR, c);
 		}
 	
 	}
 };
 
-struct TuningCircle : LedDisplay {
+struct TuningCircle : Widget {
 
 	XLimitJIAutotuner* mModule = nullptr;
 
@@ -322,7 +313,7 @@ struct TuningCircle : LedDisplay {
 
 		auto& angles = defaultAngles;
 		if(mModule){
-			angles = mModule->angles;
+			angles = mModule->mAngles;
 		}
 
     	// Draw each line
@@ -359,7 +350,7 @@ struct TuningCircle : LedDisplay {
 
 		auto& anglesUsed = defaultAnglesUsed;
 		if(mModule) {
-			anglesUsed = mModule->anglesUsed;
+			anglesUsed = mModule->mAnglesUsed;
 		}
 		
     	// Draw each line
@@ -419,7 +410,8 @@ struct XLimitJIAutotunerWidget : ModuleWidget {
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(12.65, 97.132)), module, XLimitJIAutotuner::VOCT_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(110.132, 97.132)), module, XLimitJIAutotuner::SQR_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(110.132, 97.132)), module, XLimitJIAutotuner::VOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(110.132, 69.5415)), module, XLimitJIAutotuner::VOUTRES_OUTPUT));
 
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(109.207, 24.133)), module, XLimitJIAutotuner::PATH1_LIGHT));
 
