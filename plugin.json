@@ -36,7 +36,7 @@
     {
       "slug": "XLimitJIVCO",
       "name": "X-Limit JI VCO",
-      "description": "",
+      "description": "VCO for the X-Limit JI Autotuner modules",
       "tags": [
         "Polyphonic",
         "VCO"
