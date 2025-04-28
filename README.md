@@ -98,5 +98,6 @@ https://www.patreon.com/Aloboi/shop/alobend-only-available-for-logic-pro-x-74831
 # Patch examples
 ## Static just intonation (left channel) vs Dynamic just intonation (right channel)
 
-![image](https://github.com/user-attachments/assets/5161f8c7-bb97-4081-89e5-d1c1d16a7ff4)
+![image](https://github.com/user-attachments/assets/40f583b1-b0d4-41f8-8336-584b8bd0d0a5)
+
 
