@@ -104,72 +104,72 @@ struct XLimitJIAutotuner2 : Module {
 	XLimitJIAutotuner2() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		
-		configParam(H0_PARAM, 1.f, 1024.f, 2.f, "Harmonic 0");
+		configParam(H0_PARAM, 1.f, 1024.f, 2.f, "Harmonic");
 		paramQuantities[H0_PARAM]->snapEnabled = true;		
-		configParam(H1_PARAM, 1.f, 1024.f, 3.f, "Harmonic 1");
-		paramQuantities[H1_PARAM]->snapEnabled = true;		
-		configParam(H2_PARAM, 1.f, 1024.f, 5.f, "Harmonic 2");
+		configParam(H1_PARAM, 1.f, 1024.f, 3.f, "Harmonic");
+		paramQuantities[H1_PARAM]->snapEnabled = true;	
+		configParam(H2_PARAM, 1.f, 1024.f, 5.f, "Harmonic");
 		paramQuantities[H2_PARAM]->snapEnabled = true;		
-		configParam(H3_PARAM, 1.f, 1024.f, 7.f, "Harmonic 3");
+		configParam(H3_PARAM, 1.f, 1024.f, 7.f, "Harmonic");
 		paramQuantities[H3_PARAM]->snapEnabled = true;		
-		configParam(H4_PARAM, 1.f, 1024.f, 11.f, "Harmonic 4");
+		configParam(H4_PARAM, 1.f, 1024.f, 11.f, "Harmonic");
 		paramQuantities[H4_PARAM]->snapEnabled = true;		
-		configParam(H5_PARAM, 1.f, 1024.f, 13.f, "Harmonic 5");
+		configParam(H5_PARAM, 1.f, 1024.f, 13.f, "Harmonic");
 		paramQuantities[H5_PARAM]->snapEnabled = true;		
-		configParam(H6_PARAM, 1.f, 1024.f, 17.f, "Harmonic 6");
+		configParam(H6_PARAM, 1.f, 1024.f, 17.f, "Harmonic");
 		paramQuantities[H6_PARAM]->snapEnabled = true;		
-		configParam(H7_PARAM, 1.f, 1024.f, 19.f, "Harmonic 7");
+		configParam(H7_PARAM, 1.f, 1024.f, 19.f, "Harmonic");
 		paramQuantities[H7_PARAM]->snapEnabled = true;
 		
-		configParam(S0_PARAM, 1.f, 1024.f, 1.f, "Subarmonic 0");
+		configParam(S0_PARAM, 1.f, 1024.f, 1.f, "Subarmonic");
 		paramQuantities[S0_PARAM]->snapEnabled = true;		
-		configParam(S1_PARAM, 1.f, 1024.f, 1.f, "Subharmonic 1");
+		configParam(S1_PARAM, 1.f, 1024.f, 1.f, "Subharmonic");
 		paramQuantities[S1_PARAM]->snapEnabled = true;		
-		configParam(S2_PARAM, 1.f, 1024.f, 1.f, "Subharmonic 2");
+		configParam(S2_PARAM, 1.f, 1024.f, 1.f, "Subharmonic");
 		paramQuantities[S2_PARAM]->snapEnabled = true;		
-		configParam(S3_PARAM, 1.f, 1024.f, 1.f, "Subharmonic 3");
+		configParam(S3_PARAM, 1.f, 1024.f, 1.f, "Subharmonic");
 		paramQuantities[S3_PARAM]->snapEnabled = true;		
-		configParam(S4_PARAM, 1.f, 1024.f, 1.f, "Subharmonic 4");
+		configParam(S4_PARAM, 1.f, 1024.f, 1.f, "Subharmonic");
 		paramQuantities[S4_PARAM]->snapEnabled = true;		
-		configParam(S5_PARAM, 1.f, 1024.f, 1.f, "Subharmonic 5");
+		configParam(S5_PARAM, 1.f, 1024.f, 1.f, "Subharmonic");
 		paramQuantities[S5_PARAM]->snapEnabled = true;		
-		configParam(S6_PARAM, 1.f, 1024.f, 1.f, "Subharmonic 6");
+		configParam(S6_PARAM, 1.f, 1024.f, 1.f, "Subharmonic");
 		paramQuantities[S6_PARAM]->snapEnabled = true;		
-		configParam(S7_PARAM, 1.f, 1024.f, 1.f, "Subharmonic 7");
+		configParam(S7_PARAM, 1.f, 1024.f, 1.f, "Subharmonic");
 		paramQuantities[S7_PARAM]->snapEnabled = true;
 		
-		configParam(LB0_PARAM, -100.f, 100.f, -10.f, "Lower Bound 0");
+		configParam(LB0_PARAM, -100.f, 100.f, -10.f, "Lower Bound");
 		paramQuantities[LB0_PARAM]->snapEnabled = true;
-		configParam(LB1_PARAM, -100.f, 100.f, -2.f, "Lower Bound 1");
+		configParam(LB1_PARAM, -100.f, 100.f, -2.f, "Lower Bound");
 		paramQuantities[LB1_PARAM]->snapEnabled = true;
-		configParam(LB2_PARAM, -100.f, 100.f, -1.f, "Lower Bound 2");
+		configParam(LB2_PARAM, -100.f, 100.f, -1.f, "Lower Bound");
 		paramQuantities[LB2_PARAM]->snapEnabled = true;
-		configParam(LB3_PARAM, -100.f, 100.f, 0.f, "Lower Bound 3");
+		configParam(LB3_PARAM, -100.f, 100.f, 0.f, "Lower Bound");
 		paramQuantities[LB3_PARAM]->snapEnabled = true;
-		configParam(LB4_PARAM, -100.f, 100.f, 0.f, "Lower Bound 4");
+		configParam(LB4_PARAM, -100.f, 100.f, 0.f, "Lower Bound");
 		paramQuantities[LB4_PARAM]->snapEnabled = true;
-		configParam(LB5_PARAM, -100.f, 100.f, 0.f, "Lower Bound 5");
+		configParam(LB5_PARAM, -100.f, 100.f, 0.f, "Lower Bound");
 		paramQuantities[LB5_PARAM]->snapEnabled = true;
-		configParam(LB6_PARAM, -100.f, 100.f, 0.f, "Lower Bound 6");
+		configParam(LB6_PARAM, -100.f, 100.f, 0.f, "Lower Bound");
 		paramQuantities[LB6_PARAM]->snapEnabled = true;
-		configParam(LB7_PARAM, -100.f, 100.f, 0.f, "Lower Bound 7");
+		configParam(LB7_PARAM, -100.f, 100.f, 0.f, "Lower Bound");
 		paramQuantities[LB7_PARAM]->snapEnabled = true;
 		
-		configParam(UB0_PARAM, -100.f, 100.f, 10.f, "Upper Bound 0");
+		configParam(UB0_PARAM, -100.f, 100.f, 10.f, "Upper Bound");
 		paramQuantities[UB0_PARAM]->snapEnabled = true;
-		configParam(UB1_PARAM, -100.f, 100.f, 2.f, "Upper Bound 1");
+		configParam(UB1_PARAM, -100.f, 100.f, 2.f, "Upper Bound");
 		paramQuantities[UB1_PARAM]->snapEnabled = true;
-		configParam(UB2_PARAM, -100.f, 100.f, 1.f, "Upper Bound 2");
+		configParam(UB2_PARAM, -100.f, 100.f, 1.f, "Upper Bound");
 		paramQuantities[UB2_PARAM]->snapEnabled = true;
-		configParam(UB3_PARAM, -100.f, 100.f, 0.f, "Upper Bound 3");
+		configParam(UB3_PARAM, -100.f, 100.f, 0.f, "Upper Bound");
 		paramQuantities[UB3_PARAM]->snapEnabled = true;
-		configParam(UB4_PARAM, -100.f, 100.f, 0.f, "Upper Bound 4");
+		configParam(UB4_PARAM, -100.f, 100.f, 0.f, "Upper Bound");
 		paramQuantities[UB4_PARAM]->snapEnabled = true;
-		configParam(UB5_PARAM, -100.f, 100.f, 0.f, "Upper Bound 5");
+		configParam(UB5_PARAM, -100.f, 100.f, 0.f, "Upper Bound");
 		paramQuantities[UB5_PARAM]->snapEnabled = true;
-		configParam(UB6_PARAM, -100.f, 100.f, 0.f, "Upper Bound 6");
+		configParam(UB6_PARAM, -100.f, 100.f, 0.f, "Upper Bound");
 		paramQuantities[UB6_PARAM]->snapEnabled = true;
-		configParam(UB7_PARAM, -100.f, 100.f, 0.f, "Upper Bound 7");
+		configParam(UB7_PARAM, -100.f, 100.f, 0.f, "Upper Bound");
 		paramQuantities[UB7_PARAM]->snapEnabled = true;
 
 		configSwitch(BUT0_PARAM, 0.f, 1.f, 1.f, "Mirror Bounds", {"0","1"});
@@ -468,7 +468,7 @@ struct XLimitJIAutotuner2 : Module {
 	}
 };
 
-struct TuningCircle2 : Widget {
+struct TuningCircle2 : LedDisplay {
 
 	XLimitJIAutotuner2* mModule = nullptr;
 
@@ -518,8 +518,14 @@ struct TuningCircle2 : Widget {
 
 	void draw(const DrawArgs& args) override {
 
+		bool isDark = settings::preferDarkPanels;
+		auto bgColor = nvgRGBf(1.0,1.0,1.0);
+		if(isDark){
+			bgColor = nvgRGBf(0.0666, 0.0, 0.1);
+		}
+
 		// Draw a yellow rectangle with the size of this widget
-		nvgFillColor(args.vg, nvgRGBf(1.0, 1.0, 1.0));
+		nvgFillColor(args.vg, bgColor);
 		nvgBeginPath(args.vg);
 		nvgRect(args.vg, 0.0, 0.0, box.size.x, box.size.y);
 		nvgFill(args.vg);
@@ -561,13 +567,13 @@ struct TuningCircle2 : Widget {
     	}
 		
 		// Draw a blue circle
-		nvgFillColor(args.vg, nvgRGBf(0.0, 0.0, 0.0));
+		nvgFillColor(args.vg, nvgRGBf(0.2 * isDark, 0.2 * isDark, 0.2 * isDark));
 		nvgBeginPath(args.vg);
 		nvgCircle(args.vg, centerX, centerY, mm2px(radiusMiddle));
 		nvgFill(args.vg);
 
 		// Draw a blue circle
-		nvgFillColor(args.vg, nvgRGBf(1.0, 1.0, 1.0));
+		nvgFillColor(args.vg, bgColor);
 		nvgBeginPath(args.vg);
 		nvgCircle(args.vg, centerX, centerY, mm2px(radiusMiddle - 1.f));
 		nvgFill(args.vg);	
@@ -598,13 +604,13 @@ struct TuningCircle2 : Widget {
     	}	
 		
 		// Draw a blue circle
-		nvgFillColor(args.vg, nvgRGBf(0.0, 0.0, 0.0));
+		nvgFillColor(args.vg, nvgRGBf(0.2 * isDark, 0.2 * isDark, 0.2 * isDark));
 		nvgBeginPath(args.vg);
 		nvgCircle(args.vg, centerX, centerY, mm2px(radiusInner));
 		nvgFill(args.vg);
 
 		// Draw a blue circle
-		nvgFillColor(args.vg, nvgRGBf(1.0, 1.0, 1.0));
+		nvgFillColor(args.vg, bgColor);
 		nvgBeginPath(args.vg);
 		nvgCircle(args.vg, centerX, centerY, mm2px(radiusInner - 1.f));
 		nvgFill(args.vg);
@@ -616,12 +622,15 @@ struct TuningCircle2 : Widget {
 struct XLimitJIAutotuner2Widget : ModuleWidget {
 	XLimitJIAutotuner2Widget(XLimitJIAutotuner2* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/XLimitJIAutotuner2.svg")));
+		setPanel(createPanel(
+			asset::plugin(pluginInstance, "res/XLimitJIAutotuner2.svg"),
+			asset::plugin(pluginInstance, "res/XLimitJIAutotuner2-dark.svg")
+		));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(17.273, 35.133)), module, XLimitJIAutotuner2::H0_PARAM));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(27.273, 35.133)), module, XLimitJIAutotuner2::S0_PARAM));
@@ -665,10 +674,10 @@ struct XLimitJIAutotuner2Widget : ModuleWidget {
 		addParam(createLightParamCentered<VCVLightLatch<SmallSimpleLight<WhiteLight>>>(mm2px(Vec(46.273, 77.133)), module, XLimitJIAutotuner2::BUT6_PARAM, XLimitJIAutotuner2::BUT6_LIGHT));
 		addParam(createLightParamCentered<VCVLightLatch<SmallSimpleLight<WhiteLight>>>(mm2px(Vec(46.273, 84.133)), module, XLimitJIAutotuner2::BUT7_PARAM, XLimitJIAutotuner2::BUT7_LIGHT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.9305, 104.541)), module, XLimitJIAutotuner2::VIN_INPUT));
+		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(11.9305, 104.541)), module, XLimitJIAutotuner2::VIN_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(111.132, 104.541)), module, XLimitJIAutotuner2::VOUT_OUTPUT));		
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(95.1325, 104.541)), module, XLimitJIAutotuner2::VOUTRES_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(111.132, 104.541)), module, XLimitJIAutotuner2::VOUT_OUTPUT));		
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(95.1325, 104.541)), module, XLimitJIAutotuner2::VOUTRES_OUTPUT));
 
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(74.232, 17.133)), module, XLimitJIAutotuner2::MONZO_LIGHT));
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(74.232, 35.133)), module, XLimitJIAutotuner2::BOUNDS0_LIGHT));

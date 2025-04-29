@@ -294,9 +294,15 @@ struct TuningCircle : Widget {
 	}
 
 	void draw(const DrawArgs& args) override {
+		
+		bool isDark = settings::preferDarkPanels;
+		auto bgColor = nvgRGBf(1.0,1.0,1.0);
+		if(isDark){
+			bgColor = nvgRGBf(0.0666, 0.0, 0.1);
+		}
 
 		// Draw a yellow rectangle with the size of this widget
-		nvgFillColor(args.vg, nvgRGBf(1.0, 1.0, 1.0));
+		nvgFillColor(args.vg, bgColor);
 		nvgBeginPath(args.vg);
 		nvgRect(args.vg, 0.0, 0.0, box.size.x, box.size.y);
 		nvgFill(args.vg);
@@ -337,13 +343,13 @@ struct TuningCircle : Widget {
     	}
 		
 		// Draw a blue circle
-		nvgFillColor(args.vg, nvgRGBf(0.0, 0.0, 0.0));
+		nvgFillColor(args.vg, nvgRGBf(0.2 * isDark, 0.2 * isDark, 0.2 * isDark));
 		nvgBeginPath(args.vg);
 		nvgCircle(args.vg, centerX, centerY, mm2px(radiusMiddle));
 		nvgFill(args.vg);
 
 		// Draw a blue circle
-		nvgFillColor(args.vg, nvgRGBf(1.0, 1.0, 1.0));
+		nvgFillColor(args.vg, bgColor);
 		nvgBeginPath(args.vg);
 		nvgCircle(args.vg, centerX, centerY, mm2px(radiusMiddle - 1.f));
 		nvgFill(args.vg);	
@@ -374,13 +380,13 @@ struct TuningCircle : Widget {
     	}	
 		
 		// Draw a blue circle
-		nvgFillColor(args.vg, nvgRGBf(0.0, 0.0, 0.0));
+		nvgFillColor(args.vg, nvgRGBf(0.2 * isDark, 0.2 * isDark, 0.2 * isDark));
 		nvgBeginPath(args.vg);
 		nvgCircle(args.vg, centerX, centerY, mm2px(13.f * 0.33f));
 		nvgFill(args.vg);
 
 		// Draw a blue circle
-		nvgFillColor(args.vg, nvgRGBf(1.0, 1.0, 1.0));
+		nvgFillColor(args.vg, bgColor);
 		nvgBeginPath(args.vg);
 		nvgCircle(args.vg, centerX, centerY, mm2px(13.f * 0.33f - 1.f));
 		nvgFill(args.vg);
@@ -392,12 +398,15 @@ struct TuningCircle : Widget {
 struct XLimitJIAutotunerWidget : ModuleWidget {
 	XLimitJIAutotunerWidget(XLimitJIAutotuner* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/XLimitJIAutotuner.svg")));
+		setPanel(createPanel(
+			asset::plugin(pluginInstance, "res/XLimitJIAutotuner.svg"),
+			asset::plugin(pluginInstance, "res/XLimitJIAutotuner-dark.svg")
+		));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.5, 37.238)), module, XLimitJIAutotuner::POW2_PARAM));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(28.5, 37.238)), module, XLimitJIAutotuner::POW3_PARAM));
@@ -408,10 +417,10 @@ struct XLimitJIAutotunerWidget : ModuleWidget {
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(98.5, 37.238)), module, XLimitJIAutotuner::POW17_PARAM));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(112.5, 37.238)), module, XLimitJIAutotuner::POW19_PARAM));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(12.65, 97.132)), module, XLimitJIAutotuner::VOCT_INPUT));
+		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(12.65, 97.132)), module, XLimitJIAutotuner::VOCT_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(110.132, 97.132)), module, XLimitJIAutotuner::VOUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(110.132, 69.5415)), module, XLimitJIAutotuner::VOUTRES_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(110.132, 97.132)), module, XLimitJIAutotuner::VOUT_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(110.132, 69.5415)), module, XLimitJIAutotuner::VOUTRES_OUTPUT));
 
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(109.207, 24.133)), module, XLimitJIAutotuner::PATH1_LIGHT));
 

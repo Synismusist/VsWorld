@@ -65,13 +65,13 @@ struct XLimitJIVCO : Module {
 	}
 	
 	double generateSawtoothTable(double phase, double freq, double sampleRate) {
-		int harmonicIdx = clamp((int)(0.4 * sampleRate / freq), 0, harmonicsSize - 1);
+		int harmonicIdx = clamp((int)(0.4 * sampleRate / freq) - 1, 0, harmonicsSize - 1);
 		//int tableIdx = phase * tableSize;
 		return 5.0 * readWavetable(sawtoothTable, phase * tableSize, harmonicIdx * tableSize);
 	}
 
 	double generateSquareTable(double phase, double freq, double sampleRate) {
-		int harmonicIdx = clamp((int)(0.4 * sampleRate / freq), 0, harmonicsSize - 1);
+		int harmonicIdx = clamp((int)(0.4 * sampleRate / freq) - 1, 0, harmonicsSize - 1);
 		//return 5.0 * readWavetable(squareTable, tableIdx + harmonicIdx * tableSize);
 		return 5.0 * readWavetable(squareTable, phase * tableSize, harmonicIdx * tableSize);
 	}
@@ -190,21 +190,24 @@ struct XLimitJIVCO : Module {
 struct XLimitJIVCOWidget : ModuleWidget {
 	XLimitJIVCOWidget(XLimitJIVCO* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/XLimitJIVCO.svg")));
+		setPanel(createPanel(
+			asset::plugin(pluginInstance, "res/XLimitJIVCO.svg"), 
+			asset::plugin(pluginInstance, "res/XLimitJIVCO-dark.svg")
+		));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.132, 34.133)), module, XLimitJIVCO::SYNC_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.133, 63.133)), module, XLimitJIVCO::VOCTRES_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.133, 92.132)), module, XLimitJIVCO::VOCT_INPUT));
+		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(14.132, 34.133)), module, XLimitJIVCO::SYNC_INPUT));
+		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(14.133, 63.133)), module, XLimitJIVCO::VOCTRES_INPUT));
+		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(14.133, 92.132)), module, XLimitJIVCO::VOCT_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(36.796, 34.133)), module, XLimitJIVCO::SIN_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(36.795, 53.432)), module, XLimitJIVCO::TRI_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(36.795, 72.732)), module, XLimitJIVCO::SAW_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(36.795, 92.132)), module, XLimitJIVCO::SQR_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(36.796, 34.133)), module, XLimitJIVCO::SIN_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(36.795, 53.432)), module, XLimitJIVCO::TRI_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(36.795, 72.732)), module, XLimitJIVCO::SAW_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(36.795, 92.132)), module, XLimitJIVCO::SQR_OUTPUT));
 	}
 };
 
