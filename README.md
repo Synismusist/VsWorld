@@ -47,7 +47,6 @@ For more information, check out this article from Felix Roos: https://loophole-l
 VCO for the X-Limit JI Autotuner modules with a wavetable VCO to reduce floating point inaccuracies for minimal beating.
 
 # Images
-Ligh            | Dark
 :-------------------------:|:-------------------------:
 ![image](https://github.com/user-attachments/assets/01bec857-770c-4400-bad2-4a0b1ce062de) | ![image](https://github.com/user-attachments/assets/eec7b422-13fc-4270-b9ed-3976062abaca)
 ![image](https://github.com/user-attachments/assets/4cffd61c-d0e5-4cb2-bbae-cd3f695b852a) | ![image](https://github.com/user-attachments/assets/975297ee-607d-40c6-9e3a-e69d0d4e643e)
