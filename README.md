@@ -49,9 +49,9 @@ VCO for the X-Limit JI Autotuner modules with a wavetable VCO to reduce floating
 # Images
 Light | Dark
 :-------------------------:|:-------------------------:
-<img src="https://github.com/user-attachments/assets/01bec857-770c-4400-bad2-4a0b1ce062de" height="500"> | <img src="https://github.com/user-attachments/assets/eec7b422-13fc-4270-b9ed-3976062abaca" height="500">
-<img src="https://github.com/user-attachments/assets/4cffd61c-d0e5-4cb2-bbae-cd3f695b852a" height="500"> | <img src="https://github.com/user-attachments/assets/975297ee-607d-40c6-9e3a-e69d0d4e643e" height="500">
-<img src="https://github.com/user-attachments/assets/a52b8812-b058-4591-9617-433d74923c83" height="500"> | <img src="https://github.com/user-attachments/assets/e980ce36-bba0-4941-8215-fb5a7951c1b2" height="500">
+<img src="https://github.com/user-attachments/assets/01bec857-770c-4400-bad2-4a0b1ce062de" height="300"> | <img src="https://github.com/user-attachments/assets/eec7b422-13fc-4270-b9ed-3976062abaca" height="300">
+<img src="https://github.com/user-attachments/assets/4cffd61c-d0e5-4cb2-bbae-cd3f695b852a" height="300"> | <img src="https://github.com/user-attachments/assets/975297ee-607d-40c6-9e3a-e69d0d4e643e" height="300">
+<img src="https://github.com/user-attachments/assets/a52b8812-b058-4591-9617-433d74923c83" height="300"> | <img src="https://github.com/user-attachments/assets/e980ce36-bba0-4941-8215-fb5a7951c1b2" height="300">
 
 
 
