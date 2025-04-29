@@ -450,11 +450,8 @@ struct XLimitJIAutotuner2 : Module {
 		mAnglesUsed.resize(channels);
 		
 		double baseVoltage = inputs[VIN_INPUT].getPolyVoltage(0);
-		outputs[VOUT_OUTPUT].setVoltage(baseVoltage, 0);
-		outputs[VOUTRES_OUTPUT].setVoltage(0.f, 0);
-		mAnglesUsed[0] = 0.f;
 
-		for (int c = 1; c < channels; c++) {
+		for (int c = 0; c < channels; c++) {
 			double currVoltage = inputs[VIN_INPUT].getPolyVoltage(c);
 			double harmonicVoltage = findClosestInSorted(currVoltage - baseVoltage);
 			mAnglesUsed[c] = getFractionalPart(harmonicVoltage);
