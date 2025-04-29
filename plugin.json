@@ -1,7 +1,7 @@
 {
   "slug": "VsWorld",
   "name": "V's World",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "license": "GPL-3.0-or-later",
   "brand": "V's World",
   "author": "Viktor Schiff",
@@ -36,7 +36,7 @@
     {
       "slug": "XLimitJIVCO",
       "name": "X-Limit JI VCO",
-      "description": "VCO for the X-Limit JI Autotuner modules",
+      "description": "Wavetable VCO for Autotuner modules",
       "tags": [
         "Polyphonic",
         "VCO"
