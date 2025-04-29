@@ -53,6 +53,12 @@ Light | Dark
 <img src="https://github.com/user-attachments/assets/4cffd61c-d0e5-4cb2-bbae-cd3f695b852a" style="height: 100%; max-height: 500px; width: auto;"> | <img src="https://github.com/user-attachments/assets/975297ee-607d-40c6-9e3a-e69d0d4e643e" style="height: 100%; max-height: 500px; width: auto;">
 <img src="https://github.com/user-attachments/assets/a52b8812-b058-4591-9617-433d74923c83" style="height: 100%; max-height: 500px; width: auto;"> | <img src="https://github.com/user-attachments/assets/e980ce36-bba0-4941-8215-fb5a7951c1b2" style="height: 100%; max-height: 500px; width: auto;">
 
+<div style="display: flex; flex-direction: column;">
+    <img src="https://github.com/user-attachments/assets/01bec857-770c-4400-bad2-4a0b1ce062de" id="img1" style="width: auto; height: 300px;">
+    <img src="https://github.com/user-attachments/assets/eec7b422-13fc-4270-b9ed-3976062abaca" id="img2" style="width: auto; height: inherit;">
+    <img src="https://github.com/user-attachments/assets/4cffd61c-d0e5-4cb2-bbae-cd3f695b852a" id="img3" style="width: auto; height: inherit;">
+</div>
+
 
 
 # Parameter Examples
