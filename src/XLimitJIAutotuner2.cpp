@@ -138,11 +138,11 @@ struct XLimitJIAutotuner2 : Module {
 		configParam(S7_PARAM, 1.f, 1024.f, 1.f, "Subharmonic");
 		paramQuantities[S7_PARAM]->snapEnabled = true;
 		
-		configParam(LB0_PARAM, -100.f, 100.f, -10.f, "Lower Bound");
+		configParam(LB0_PARAM, -100.f, 100.f, 0.f, "Lower Bound");
 		paramQuantities[LB0_PARAM]->snapEnabled = true;
-		configParam(LB1_PARAM, -100.f, 100.f, -2.f, "Lower Bound");
+		configParam(LB1_PARAM, -100.f, 100.f, 0.f, "Lower Bound");
 		paramQuantities[LB1_PARAM]->snapEnabled = true;
-		configParam(LB2_PARAM, -100.f, 100.f, -1.f, "Lower Bound");
+		configParam(LB2_PARAM, -100.f, 100.f, 0.f, "Lower Bound");
 		paramQuantities[LB2_PARAM]->snapEnabled = true;
 		configParam(LB3_PARAM, -100.f, 100.f, 0.f, "Lower Bound");
 		paramQuantities[LB3_PARAM]->snapEnabled = true;
@@ -155,11 +155,11 @@ struct XLimitJIAutotuner2 : Module {
 		configParam(LB7_PARAM, -100.f, 100.f, 0.f, "Lower Bound");
 		paramQuantities[LB7_PARAM]->snapEnabled = true;
 		
-		configParam(UB0_PARAM, -100.f, 100.f, 10.f, "Upper Bound");
+		configParam(UB0_PARAM, -100.f, 100.f, 0.f, "Upper Bound");
 		paramQuantities[UB0_PARAM]->snapEnabled = true;
-		configParam(UB1_PARAM, -100.f, 100.f, 2.f, "Upper Bound");
+		configParam(UB1_PARAM, -100.f, 100.f, 0.f, "Upper Bound");
 		paramQuantities[UB1_PARAM]->snapEnabled = true;
-		configParam(UB2_PARAM, -100.f, 100.f, 1.f, "Upper Bound");
+		configParam(UB2_PARAM, -100.f, 100.f, 0.f, "Upper Bound");
 		paramQuantities[UB2_PARAM]->snapEnabled = true;
 		configParam(UB3_PARAM, -100.f, 100.f, 0.f, "Upper Bound");
 		paramQuantities[UB3_PARAM]->snapEnabled = true;
@@ -172,14 +172,14 @@ struct XLimitJIAutotuner2 : Module {
 		configParam(UB7_PARAM, -100.f, 100.f, 0.f, "Upper Bound");
 		paramQuantities[UB7_PARAM]->snapEnabled = true;
 
-		configSwitch(BUT0_PARAM, 0.f, 1.f, 1.f, "Mirror Bounds", {"0","1"});
-		configSwitch(BUT1_PARAM, 0.f, 1.f, 1.f, "Mirror Bounds", {"0","1"});
-		configSwitch(BUT2_PARAM, 0.f, 1.f, 1.f, "Mirror Bounds", {"0","1"});
-		configSwitch(BUT3_PARAM, 0.f, 1.f, 1.f, "Mirror Bounds", {"0","1"});
-		configSwitch(BUT4_PARAM, 0.f, 1.f, 1.f, "Mirror Bounds", {"0","1"});
-		configSwitch(BUT5_PARAM, 0.f, 1.f, 1.f, "Mirror Bounds", {"0","1"});
-		configSwitch(BUT6_PARAM, 0.f, 1.f, 1.f, "Mirror Bounds", {"0","1"});
-		configSwitch(BUT7_PARAM, 0.f, 1.f, 1.f, "Mirror Bounds", {"0","1"});
+		configSwitch(BUT0_PARAM, 0.f, 1.f, 0.f, "Mirror Bounds", {"0","1"});
+		configSwitch(BUT1_PARAM, 0.f, 1.f, 0.f, "Mirror Bounds", {"0","1"});
+		configSwitch(BUT2_PARAM, 0.f, 1.f, 0.f, "Mirror Bounds", {"0","1"});
+		configSwitch(BUT3_PARAM, 0.f, 1.f, 0.f, "Mirror Bounds", {"0","1"});
+		configSwitch(BUT4_PARAM, 0.f, 1.f, 0.f, "Mirror Bounds", {"0","1"});
+		configSwitch(BUT5_PARAM, 0.f, 1.f, 0.f, "Mirror Bounds", {"0","1"});
+		configSwitch(BUT6_PARAM, 0.f, 1.f, 0.f, "Mirror Bounds", {"0","1"});
+		configSwitch(BUT7_PARAM, 0.f, 1.f, 0.f, "Mirror Bounds", {"0","1"});
 
 		configLight(MONZO_LIGHT, "Monzo overfill");		
 		lights[MONZO_LIGHT].setBrightness(0.f);
@@ -203,7 +203,7 @@ struct XLimitJIAutotuner2 : Module {
 
 		configInput(VIN_INPUT, "V/Oct");
 		configOutput(VOUT_OUTPUT, "V/Oct");		
-		configOutput(VOUTRES_OUTPUT, "V/Oct Residual");
+		configOutput(VOUTRES_OUTPUT, "V/Oct residual");
 		
 		mAnglesUsed.reserve(16);
 		mVoltageList.reserve(1e7);

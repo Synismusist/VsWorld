@@ -183,11 +183,11 @@ struct XLimitJIAutotuner : Module {
 	XLimitJIAutotuner() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
-		configParam(POW2_PARAM, 0.f, 20.f, 8.f, "Pow2");
+		configParam(POW2_PARAM, 0.f, 20.f, 0.f, "Pow2");
 		paramQuantities[POW2_PARAM]->snapEnabled = true;
-		configParam(POW3_PARAM, 0.f, 20.f, 2.f, "Pow3");
+		configParam(POW3_PARAM, 0.f, 20.f, 0.f, "Pow3");
 		paramQuantities[POW3_PARAM]->snapEnabled = true;
-		configParam(POW5_PARAM, 0.f, 20.f, 1.f, "Pow5");
+		configParam(POW5_PARAM, 0.f, 20.f, 0.f, "Pow5");
 		paramQuantities[POW5_PARAM]->snapEnabled = true;
 		configParam(POW7_PARAM, 0.f, 20.f, 0.f, "Pow7");
 		paramQuantities[POW7_PARAM]->snapEnabled = true;
