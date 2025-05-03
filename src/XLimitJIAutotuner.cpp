@@ -13,6 +13,7 @@ struct XLimitJIAutotuner : Module {
 		POW13_PARAM,
 		POW17_PARAM,
 		POW19_PARAM,
+		REMAP_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -28,6 +29,8 @@ struct XLimitJIAutotuner : Module {
 		PATH1_LIGHT,
 		LIGHTS_LEN
 	};
+
+	int mVoltageListZeroIdx = 0;
 	
 	std::vector<double> mVoltageList;
 	std::vector<float> mAngles;
@@ -47,6 +50,10 @@ struct XLimitJIAutotuner : Module {
 	const double log213 = std::log2(13.0);
 	const double log217 = std::log2(17.0);
 	const double log219 = std::log2(19.0);
+	
+	double clampD(double value, double min, double max) {
+		return (value < min) ? min : (value > max) ? max : value;
+	}
 
 	double modelFunD(double v, double x2, double x3, double x5 = 0.0, double x7 = 0.0, double x11 = 0.0, double x13 = 0.0, double x17 = 0.0, double x19 = 0.0) {
 		v += log22 * x2;
@@ -68,6 +75,21 @@ struct XLimitJIAutotuner : Module {
 		// Copy values in range [0, 1) into the filter vector
 		filtered.clear();
 		filtered.assign(lower, upper);
+	}
+
+	int findClosestToZeroIndex(const std::vector<double>& vec) {
+		if (vec.empty()) return -1;  // Handle empty case
+	
+		// Binary search: Find the position where 0 would be inserted
+		auto it = std::lower_bound(vec.begin(), vec.end(), 0.0f);
+		
+		if (it == vec.begin()) return 0; // If 0 is before first element
+		if (it == vec.end()) return vec.size() - 1; // If 0 would be placed after last element
+		
+		// Compare previous and current elements to see which is closer to zero
+		int idx = std::distance(vec.begin(), it);
+		if (std::abs(vec[idx]) < std::abs(vec[idx - 1])) return idx;
+		else return idx - 1;
 	}
 
 	void buildVoltageList(){
@@ -114,7 +136,8 @@ struct XLimitJIAutotuner : Module {
 		std::sort(mVoltageList.begin(), mVoltageList.end());
 
 		filterAngles(mVoltageList, mAngles, 0.f, 1.f);	
-		
+
+		mVoltageListZeroIdx = findClosestToZeroIndex(mVoltageList);
 	}
 
 	double findClosestInSorted(double target) {
@@ -180,6 +203,14 @@ struct XLimitJIAutotuner : Module {
 		return !sizeInvalid;
 	}
 
+	bool isRemap(){
+		return params[REMAP_PARAM].getValue() == 1.f;
+	}
+	
+	void setRemap(bool remap){
+		params[REMAP_PARAM].setValue(remap);
+	}
+
 	XLimitJIAutotuner() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
@@ -226,17 +257,34 @@ struct XLimitJIAutotuner : Module {
 		outputs[VOUTRES_OUTPUT].setChannels(channels);
 		mAnglesUsed.resize(channels);
 		
-		double baseVoltage = inputs[VOCT_INPUT].getPolyVoltage(0);
-
-		for (int c = 0; c < channels; c++) {
-			double currVoltage = inputs[VOCT_INPUT].getPolyVoltage(c);
-			double harmonicVoltage = findClosestInSorted(currVoltage - baseVoltage);
-			mAnglesUsed[c] = getFractionalPart(harmonicVoltage);
-			double vout = baseVoltage + harmonicVoltage;
-			float voutF = static_cast<float>(vout);			
-			float voutR = vout - static_cast<double>(voutF);
-			outputs[VOUT_OUTPUT].setVoltage(voutF, c);
-			outputs[VOUTRES_OUTPUT].setVoltage(voutR, c);
+		if(isRemap()){
+			double currVoltage = inputs[VOCT_INPUT].getPolyVoltage(0);
+			int baseIdx = clamp((int)std::round(12.0 * currVoltage) + mVoltageListZeroIdx, 0, mVoltageList.size() - 1);
+			double baseVoltage = mVoltageList[baseIdx];
+			for (int c = 0; c < channels; c++) {
+				double currVoltage = inputs[VOCT_INPUT].getPolyVoltage(c);
+				int idx = clamp((int)std::round(12.0 * currVoltage) + mVoltageListZeroIdx - baseIdx, 0, mVoltageList.size() - 1);
+				double harmonicVoltage = mVoltageList[idx];
+				mAnglesUsed[c] = getFractionalPart(harmonicVoltage);
+				double vout = clampD(baseVoltage + harmonicVoltage, -10.0, 10.0);
+				float voutF = static_cast<float>(vout);			
+				float voutR = vout - static_cast<double>(voutF);
+				outputs[VOUT_OUTPUT].setVoltage(voutF, c);
+				outputs[VOUTRES_OUTPUT].setVoltage(voutR, c);
+			}			
+		} 
+		else {
+			double baseVoltage = inputs[VOCT_INPUT].getPolyVoltage(0);
+			for (int c = 0; c < channels; c++) {
+				double currVoltage = inputs[VOCT_INPUT].getPolyVoltage(c);
+				double harmonicVoltage = findClosestInSorted(currVoltage - baseVoltage);
+				mAnglesUsed[c] = getFractionalPart(harmonicVoltage);
+				double vout = clampD(baseVoltage + harmonicVoltage, -10.0, 10.0);
+				float voutF = static_cast<float>(vout);			
+				float voutR = vout - static_cast<double>(voutF);
+				outputs[VOUT_OUTPUT].setVoltage(voutF, c);
+				outputs[VOUTRES_OUTPUT].setVoltage(voutR, c);
+			}
 		}
 	
 	}
@@ -431,6 +479,23 @@ struct XLimitJIAutotunerWidget : ModuleWidget {
 		myWidget->setSize(mm2px(Vec(52, 52)));
 		myWidget->setModule(module);
 		addChild(myWidget);
+		
+	}
+
+	void appendContextMenu(Menu* menu) override {
+		XLimitJIAutotuner* module = getModule<XLimitJIAutotuner>();
+
+		menu->addChild(new MenuSeparator);
+
+		// Controls bool Module::loop
+		menu->addChild(createBoolMenuItem("Remap keyboard inputs to tuning circle steps", "",
+			[=]() {
+				return module->isRemap();
+			},
+			[=](bool remap) {
+				module->setRemap(remap);
+			}
+		));
 	}
 };
 

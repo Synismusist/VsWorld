@@ -50,6 +50,11 @@ struct XLimitJIAutotuner2 : Module {
 		BUT5_PARAM,
 		BUT6_PARAM,
 		BUT7_PARAM,
+
+		REMAP_PARAM,
+		SPACE_PARAM,
+		IMAGE_PARAM,
+		
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -71,19 +76,16 @@ struct XLimitJIAutotuner2 : Module {
 		BOUNDS6_LIGHT,
 		BOUNDS7_LIGHT,
 		MONZO_LIGHT,
-		BUT0_LIGHT,
-		BUT1_LIGHT,
-		BUT2_LIGHT,
-		BUT3_LIGHT,
-		BUT4_LIGHT,
-		BUT5_LIGHT,
-		BUT6_LIGHT,
-		BUT7_LIGHT,
+		SPACE_LIGHT,
+		IMAGE_LIGHT,
 		LIGHTS_LEN
 	};
+
+	int mVoltageListZeroIdx = 0;
 	
 	std::vector<double> mVoltageList;
 	std::vector<float> mAngles;
+	std::vector<float> mAnglesSpiral;
 	std::vector<float> mAnglesUsed;
 
 	std::array<int, 8> mVoltageSizeList;
@@ -172,14 +174,27 @@ struct XLimitJIAutotuner2 : Module {
 		configParam(UB7_PARAM, -100.f, 100.f, 0.f, "Upper Bound");
 		paramQuantities[UB7_PARAM]->snapEnabled = true;
 
-		configSwitch(BUT0_PARAM, 0.f, 1.f, 0.f, "Mirror Bounds", {"0","1"});
-		configSwitch(BUT1_PARAM, 0.f, 1.f, 0.f, "Mirror Bounds", {"0","1"});
-		configSwitch(BUT2_PARAM, 0.f, 1.f, 0.f, "Mirror Bounds", {"0","1"});
-		configSwitch(BUT3_PARAM, 0.f, 1.f, 0.f, "Mirror Bounds", {"0","1"});
-		configSwitch(BUT4_PARAM, 0.f, 1.f, 0.f, "Mirror Bounds", {"0","1"});
-		configSwitch(BUT5_PARAM, 0.f, 1.f, 0.f, "Mirror Bounds", {"0","1"});
-		configSwitch(BUT6_PARAM, 0.f, 1.f, 0.f, "Mirror Bounds", {"0","1"});
-		configSwitch(BUT7_PARAM, 0.f, 1.f, 0.f, "Mirror Bounds", {"0","1"});
+		configParam(BUT0_PARAM, -100.f, 100.f, 0.f, "Shift");
+		paramQuantities[BUT0_PARAM]->snapEnabled = true;
+		configParam(BUT1_PARAM, -100.f, 100.f, 0.f, "Shift");
+		paramQuantities[BUT1_PARAM]->snapEnabled = true;
+		configParam(BUT2_PARAM, -100.f, 100.f, 0.f, "Shift");
+		paramQuantities[BUT2_PARAM]->snapEnabled = true;
+		configParam(BUT3_PARAM, -100.f, 100.f, 0.f, "Shift");
+		paramQuantities[BUT3_PARAM]->snapEnabled = true;
+		configParam(BUT4_PARAM, -100.f, 100.f, 0.f, "Shift");
+		paramQuantities[BUT4_PARAM]->snapEnabled = true;
+		configParam(BUT5_PARAM, -100.f, 100.f, 0.f, "Shift");
+		paramQuantities[BUT5_PARAM]->snapEnabled = true;
+		configParam(BUT6_PARAM, -100.f, 100.f, 0.f, "Shift");
+		paramQuantities[BUT6_PARAM]->snapEnabled = true;
+		configParam(BUT7_PARAM, -100.f, 100.f, 0.f, "Shift");
+		paramQuantities[BUT7_PARAM]->snapEnabled = true;
+		
+		configSwitch(REMAP_PARAM, 0.f, 1.f, 0.f, "Remap keyoboard inputs to tuning circle steps", {"No","Yes"});
+		
+		configSwitch(SPACE_PARAM, 0.f, 1.f, 0.f, "Tuning steps", {"Pitch space","Frequency space"});
+		configSwitch(IMAGE_PARAM, 0.f, 1.f, 0.f, "Tuning circle", {"Circle (1 Octave)", "Spiral (3 Octaves)"});
 
 		configLight(MONZO_LIGHT, "Monzo overfill");		
 		lights[MONZO_LIGHT].setBrightness(0.f);
@@ -209,7 +224,27 @@ struct XLimitJIAutotuner2 : Module {
 		mVoltageList.reserve(1e7);
 
 	}
+
+	bool isRemap(){
+		return params[REMAP_PARAM].getValue() == 1.f;
+	}
 	
+	void setRemap(bool remap){
+		params[REMAP_PARAM].setValue(remap);
+	}
+
+	float getTuningSpace(){
+		return params[SPACE_PARAM].getValue();
+	}
+
+	float getCircleMode(){
+		return params[IMAGE_PARAM].getValue();
+	}
+	
+	double clampD(double value, double min, double max) {
+		return (value < min) ? min : (value > max) ? max : value;
+	}
+
 	void updateCurrentParams(){
 		mCurrParams[0] = params[H0_PARAM].getValue();
 		mCurrParams[1] = params[H1_PARAM].getValue();
@@ -307,28 +342,6 @@ struct XLimitJIAutotuner2 : Module {
 		mHistoricParams = mCurrParams;
 	}
 	
-	void updateButtonLights(){
-		float* butPtr = &(mCurrParams[32]);
-		auto* lightPtr = &(lights[BUT0_LIGHT]);
-
-		for(int i = 0; i < 8; i++){
-			lightPtr[i].setBrightness(butPtr[i]);
-		}
-	}
-	
-	void updateMirrorButtons(){
-		float* butPtr = &(mCurrParams[32]);
-		auto* lbPtr = &(params[LB0_PARAM]);
-		float* ubPtr = &(mCurrParams[24]);
-		
-		for(int i = 0; i < 8; i++){
-			if(butPtr[i] == 1.f){
-				lbPtr[i].setValue(-ubPtr[i]);
-			}
-		}
-
-	}
-
 	double modelFunD(double v, double x2, double x3, double x5 = 0.0, double x7 = 0.0, double x11 = 0.0, double x13 = 0.0, double x17 = 0.0, double x19 = 0.0) {
 		v += log22 * x2;
 		v += log23 * x3;
@@ -350,11 +363,27 @@ struct XLimitJIAutotuner2 : Module {
 		filtered.clear();
 		filtered.assign(lower, upper);
 	}
+
+	int findClosestToZeroIndex(const std::vector<double>& vec) {
+		if (vec.empty()) return -1;  // Handle empty case
+	
+		// Binary search: Find the position where 0 would be inserted
+		auto it = std::lower_bound(vec.begin(), vec.end(), 0.0f);
+		
+		if (it == vec.begin()) return 0; // If 0 is before first element
+		if (it == vec.end()) return vec.size() - 1; // If 0 would be placed after last element
+		
+		// Compare previous and current elements to see which is closer to zero
+		int idx = std::distance(vec.begin(), it);
+		if (std::abs(vec[idx]) < std::abs(vec[idx - 1])) return idx;
+		else return idx - 1;
+	}
 	
 	void buildVoltageList(){
 		float* hPtr = &(mCurrParams[0]);
 		float* sPtr = &(mCurrParams[8]);
 		float* lbPtr = &(mCurrParams[16]);
+		float* shPtr = &(mCurrParams[32]);
 
 		mVoltageList.resize(mWantedVoltageListSize);
 		
@@ -376,14 +405,14 @@ struct XLimitJIAutotuner2 : Module {
 		auto& size17 = mVoltageSizeList[6];
 		auto& size19 = mVoltageSizeList[7];
 		
-		int pow2 = lbPtr[0];
-		int pow3 = lbPtr[1];
-		int pow5 = lbPtr[2];
-		int pow7 = lbPtr[3];
-		int pow11 = lbPtr[4];
-		int pow13 = lbPtr[5];
-		int pow17 = lbPtr[6];
-		int pow19 = lbPtr[7];
+		int pow2 = lbPtr[0] + shPtr[0];
+		int pow3 = lbPtr[1] + shPtr[1];
+		int pow5 = lbPtr[2] + shPtr[2];
+		int pow7 = lbPtr[3] + shPtr[3];
+		int pow11 = lbPtr[4] + shPtr[4];
+		int pow13 = lbPtr[5] + shPtr[5];
+		int pow17 = lbPtr[6] + shPtr[6];
+		int pow19 = lbPtr[7] + shPtr[7];
 
 		for(int i2 = 0; i2 < size2; i2++)
 			for(int i3 = 0; i3 < size3; i3++)
@@ -406,8 +435,10 @@ struct XLimitJIAutotuner2 : Module {
 
 		std::sort(mVoltageList.begin(), mVoltageList.end());
 
-		filterAngles(mVoltageList, mAngles, 0.f, 1.f);	
+		filterAngles(mVoltageList, mAngles, 0.f, 1.f);
+		filterAngles(mVoltageList, mAnglesSpiral, -1.001f, 2.f);	
 		
+		mVoltageListZeroIdx = findClosestToZeroIndex(mVoltageList);		
 	}
 
 	double findClosestInSorted(double target) {
@@ -430,11 +461,14 @@ struct XLimitJIAutotuner2 : Module {
 		return value - std::floor(value); // Absolutwert für negative Zahlen
 	}
 
+	void updateButtonLights(){		
+		lights[SPACE_LIGHT].setBrightness(params[SPACE_PARAM].getValue() == 0.f);
+		lights[IMAGE_LIGHT].setBrightness(params[IMAGE_PARAM].getValue() == 0.f);
+	}
 	
 	void process(const ProcessArgs& args) override {
 
 		updateCurrentParams();
-		updateMirrorButtons();
 		updateButtonLights();
 		bool paramsValid = checkIfParamsValid();
 		bool paramsHasChanged = checkIfParamsChanged();
@@ -448,18 +482,36 @@ struct XLimitJIAutotuner2 : Module {
 		outputs[VOUT_OUTPUT].setChannels(channels);
 		outputs[VOUTRES_OUTPUT].setChannels(channels);
 		mAnglesUsed.resize(channels);
-		
-		double baseVoltage = inputs[VIN_INPUT].getPolyVoltage(0);
 
-		for (int c = 0; c < channels; c++) {
-			double currVoltage = inputs[VIN_INPUT].getPolyVoltage(c);
-			double harmonicVoltage = findClosestInSorted(currVoltage - baseVoltage);
-			mAnglesUsed[c] = getFractionalPart(harmonicVoltage);
-			double vout = baseVoltage + harmonicVoltage;
-			float voutF = static_cast<float>(vout);			
-			float voutR = vout - static_cast<double>(voutF);
-			outputs[VOUT_OUTPUT].setVoltage(voutF, c);
-			outputs[VOUTRES_OUTPUT].setVoltage(voutR, c);
+		if(isRemap()){
+			double currVoltage = inputs[VIN_INPUT].getPolyVoltage(0);
+			int baseIdx = (int)std::round(12.0 * currVoltage);
+			int idx = clamp(baseIdx + mVoltageListZeroIdx, 0, mVoltageList.size() - 1);
+			double baseVoltage = mVoltageList[idx];
+			for (int c = 0; c < channels; c++) {
+				currVoltage = inputs[VIN_INPUT].getPolyVoltage(c);
+				idx = clamp((int)std::round(12.0 * currVoltage) + mVoltageListZeroIdx - baseIdx, 0, mVoltageList.size() - 1);
+				double harmonicVoltage = mVoltageList[idx];
+				mAnglesUsed[c] = harmonicVoltage;
+				double vout = clampD(baseVoltage + harmonicVoltage, -10.0, 10.0);
+				float voutF = static_cast<float>(vout);			
+				float voutR = vout - static_cast<double>(voutF);
+				outputs[VOUT_OUTPUT].setVoltage(voutF, c);
+				outputs[VOUTRES_OUTPUT].setVoltage(voutR, c);
+			}			
+		} 		
+		else {
+			double baseVoltage = inputs[VIN_INPUT].getPolyVoltage(0);
+			for (int c = 0; c < channels; c++) {
+				double currVoltage = inputs[VIN_INPUT].getPolyVoltage(c);
+				double harmonicVoltage = findClosestInSorted(currVoltage - baseVoltage);
+				mAnglesUsed[c] = harmonicVoltage;
+				double vout = clampD(baseVoltage + harmonicVoltage, -10.0, 10.0);
+				float voutF = static_cast<float>(vout);			
+				float voutR = vout - static_cast<double>(voutF);
+				outputs[VOUT_OUTPUT].setVoltage(voutF, c);
+				outputs[VOUTRES_OUTPUT].setVoltage(voutR, c);
+			}
 		}
 	
 	}
@@ -492,6 +544,11 @@ struct TuningCircle2 : LedDisplay {
 		mModule = module;
 	}
 	
+	double getFractionalPart(double value) {
+		// Subtrahiere die Ganzzahl-Komponente, um die Nachkommastellen zu erhalten
+		return value - std::floor(value); // Absolutwert für negative Zahlen
+	}
+	
 	NVGcolor hsvToRgb(float h, float s, float v) {
 		float r = 0.f, g = 0.f, b = 0.f;
 	
@@ -514,6 +571,18 @@ struct TuningCircle2 : LedDisplay {
 	}
 
 	void draw(const DrawArgs& args) override {
+		bool circleMode = true;
+		if(mModule){
+			circleMode = mModule->getCircleMode() == 0.f;
+		}
+		if(circleMode){		
+			drawCircle(args);
+		}else{
+			drawSpiral(args);
+		}
+	}
+
+	void drawCircle(const DrawArgs& args) {
 
 		bool isDark = settings::preferDarkPanels;
 		auto bgColor = nvgRGBf(1.0,1.0,1.0);
@@ -531,8 +600,8 @@ struct TuningCircle2 : LedDisplay {
     	float centerX = box.size.x * 0.5f;
     	float centerY = box.size.y * 0.5f;
 
-    	float radiusOuter = 40.f * 0.5f;	
-    	float radiusInner = radiusOuter * 0.33f * 0.5f;		
+    	float radiusOuter = (56.5 - 4.f) * 0.5f;	
+    	float radiusInner = radiusOuter * 0.333f * 0.5f;		
     	float radiusMiddle = (radiusOuter + radiusInner) * 0.5f;
 
 		float radius = mm2px(radiusOuter);
@@ -546,7 +615,14 @@ struct TuningCircle2 : LedDisplay {
     	// Draw each line
     	for (float normalizedAngle : angles) {
         	// Convert normalized angle [0, 1) to radians [0, 2*PI)
-        	float angleRadians = (normalizedAngle - 0.25) * 2.0f * M_PI;
+        	float angleRadians = normalizedAngle - 0.25;
+			if(mModule){
+				if(mModule->getTuningSpace() == 1.f) {
+					angleRadians = (std::exp2(normalizedAngle) - 1.f - 0.25f);
+				} 
+
+			}
+			angleRadians *= 2.0f * M_PI;
 
         	// Calculate line start and end points
         	float x1 = centerX;  // Start point (center of the circle)
@@ -576,14 +652,22 @@ struct TuningCircle2 : LedDisplay {
 		nvgFill(args.vg);	
 
 		auto& anglesUsed = mDefaultAnglesUsed;
+		bool freqSpace = false;
 		if(mModule) {
 			anglesUsed = mModule->mAnglesUsed;
+			freqSpace = mModule->getTuningSpace() == 1.f;
 		}
 		
     	// Draw each line
-    	for (float normalizedAngle : anglesUsed) {
+    	for (float unnormalizedAngle : anglesUsed) {
+			float normalizedAngle = getFractionalPart(unnormalizedAngle);
         	// Convert normalized angle [0, 1) to radians [0, 2*PI)
-        	float angleRadians = (normalizedAngle - 0.25) * 2.0f * M_PI;
+        	float angleRadians = normalizedAngle - 0.25;
+			if(freqSpace){
+				angleRadians = (std::exp2(normalizedAngle) - 1.f - 0.25f);		
+
+			}
+			angleRadians *= 2.0f * M_PI;
 
         	// Calculate line start and end points
         	float x1 = centerX;  // Start point (center of the circle)
@@ -600,18 +684,116 @@ struct TuningCircle2 : LedDisplay {
         	nvgStroke(args.vg);
     	}	
 		
-		// Draw a blue circle
-		nvgFillColor(args.vg, nvgRGBf(0.2 * isDark, 0.2 * isDark, 0.2 * isDark));
-		nvgBeginPath(args.vg);
-		nvgCircle(args.vg, centerX, centerY, mm2px(radiusInner));
-		nvgFill(args.vg);
-
+		
 		// Draw a blue circle
 		nvgFillColor(args.vg, bgColor);
 		nvgBeginPath(args.vg);
 		nvgCircle(args.vg, centerX, centerY, mm2px(radiusInner - 1.f));
 		nvgFill(args.vg);
 
+	}
+
+	void drawSpiral(const DrawArgs& args) {		
+		bool isDark = settings::preferDarkPanels;
+		auto bgColor = nvgRGBf(1.0,1.0,1.0);
+		if(isDark){
+			bgColor = nvgRGBf(0.0666, 0.0, 0.1);
+		}
+
+		const int numSegments = 100;
+		const float startRadius = mm2px(2.5f);
+		const float endRadius = mm2px(22.f);
+		float x = box.size.x * 0.5f;
+		float y = box.size.y * 0.5f;
+		const float angleStep = (2.0f * M_PI * 3) / numSegments; // Covers 3 full turns		
+		bool freqSpace = false;
+
+		if(mModule){
+			freqSpace = mModule->getTuningSpace();
+			auto& angles = mModule->mAnglesSpiral;
+			for (float angle : angles) {
+				if(angle < -1.f || angle > 2.f){
+					continue;
+				}
+				float angleFrac = getFractionalPart(angle);
+				if(freqSpace){
+					angle = (std::floor(angle) + (std::exp2(angleFrac) - 1.f));
+				}				
+        		float radian = angle * 2.0f * M_PI - M_PI / 2;
+
+				// Find closest radius on the spiral path
+				float closestRadius = startRadius + (endRadius - startRadius) * ((angle + 1.0f) / 3.0f);
+        		float px = x + closestRadius * cos(radian);
+        		float py = y + closestRadius * sin(radian);
+
+				// Determine line length based on spacing (adjust coefficient if needed)
+				float closestRadius2 = startRadius + (endRadius - startRadius) * ((angle + 1.0f + 1.0f) / 3.0f);
+				float lx = x + closestRadius2 * cos(radian);
+				float ly = y + closestRadius2 * sin(radian);
+
+				nvgBeginPath(args.vg);
+        		nvgMoveTo(args.vg, px, py);
+        		nvgLineTo(args.vg, lx, ly);
+				nvgStrokeColor(args.vg, hsvToRgb(angleFrac, 0.9999f, 0.9999f));  // Red color
+				nvgStrokeWidth(args.vg, 2.0f);  // Line thickness
+				nvgStroke(args.vg);
+    		}
+
+			auto& anglesUsed = mModule->mAnglesUsed;
+			nvgBeginPath(args.vg);
+    		for (float angle : anglesUsed) {
+				if(angle < -1.f || angle > 2.f){
+					continue;
+				}
+				float angleFrac = getFractionalPart(angle);
+				if(freqSpace){
+					angle = (std::floor(angle) + (std::exp2(angleFrac) - 1.f));
+				}
+        		float radian = angle * 2.0f * M_PI - M_PI / 2;
+
+				// Find closest radius on the spiral path
+				float closestRadius = startRadius + (endRadius - startRadius) * ((angle + 1.0f) / 3.0f);
+        		float px = x + closestRadius * cos(radian);
+        		float py = y + closestRadius * sin(radian);
+
+				// Determine line length based on spacing (adjust coefficient if needed)
+				float closestRadius2 = startRadius + (endRadius - startRadius) * ((angle + 1.0f + 1.0f) / 3.0f);
+				float lx = x + closestRadius2 * cos(radian);
+				float ly = y + closestRadius2 * sin(radian);
+
+        		nvgMoveTo(args.vg, px, py);
+        		nvgLineTo(args.vg, lx, ly);
+    		}
+			nvgStrokeColor(args.vg, nvgRGBf(isDark, isDark, isDark));  // Red color
+			nvgStrokeWidth(args.vg, 2.0f);  // Line thickness
+			nvgStroke(args.vg);
+			
+		}
+
+		nvgBeginPath(args.vg);
+    	float prevX = x + startRadius * cos(-0.5f * M_PI);
+    	float prevY = y + startRadius * sin(-0.5f * M_PI);
+
+    	for (int i = 1; i <= numSegments; ++i) {
+        	float angle = i * angleStep - 0.5 * M_PI;
+        	float radius = startRadius + (endRadius - startRadius) * (i / static_cast<float>(numSegments));
+        	float px = x + radius * cos(angle);
+        	float py = y + radius * sin(angle);
+
+        	float cx = (prevX + px) / 2;
+        	float cy = (prevY + py) / 2;
+
+        	if (i == 1) {
+        	    nvgMoveTo(args.vg, prevX, prevY);
+        	}
+
+        	nvgQuadTo(args.vg, cx, cy, px, py);
+        	prevX = px;
+        	prevY = py;
+    	}
+		nvgStrokeColor(args.vg, nvgRGBf(0.2 * isDark, 0.2 * isDark, 0.2 * isDark));  // Red color
+		nvgStrokeWidth(args.vg, 2.0f);  // Line thickness
+		nvgStroke(args.vg);
 	}
 };
 
@@ -662,19 +844,19 @@ struct XLimitJIAutotuner2Widget : ModuleWidget {
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(56.273, 84.133)), module, XLimitJIAutotuner2::LB7_PARAM));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(66.273, 84.133)), module, XLimitJIAutotuner2::UB7_PARAM));
 		
-		addParam(createLightParamCentered<VCVLightLatch<SmallSimpleLight<WhiteLight>>>(mm2px(Vec(46.273, 35.133)), module, XLimitJIAutotuner2::BUT0_PARAM, XLimitJIAutotuner2::BUT0_LIGHT));
-		addParam(createLightParamCentered<VCVLightLatch<SmallSimpleLight<WhiteLight>>>(mm2px(Vec(46.273, 42.133)), module, XLimitJIAutotuner2::BUT1_PARAM, XLimitJIAutotuner2::BUT1_LIGHT));
-		addParam(createLightParamCentered<VCVLightLatch<SmallSimpleLight<WhiteLight>>>(mm2px(Vec(46.273, 49.133)), module, XLimitJIAutotuner2::BUT2_PARAM, XLimitJIAutotuner2::BUT2_LIGHT));
-		addParam(createLightParamCentered<VCVLightLatch<SmallSimpleLight<WhiteLight>>>(mm2px(Vec(46.273, 56.133)), module, XLimitJIAutotuner2::BUT3_PARAM, XLimitJIAutotuner2::BUT3_LIGHT));
-		addParam(createLightParamCentered<VCVLightLatch<SmallSimpleLight<WhiteLight>>>(mm2px(Vec(46.273, 63.133)), module, XLimitJIAutotuner2::BUT4_PARAM, XLimitJIAutotuner2::BUT4_LIGHT));
-		addParam(createLightParamCentered<VCVLightLatch<SmallSimpleLight<WhiteLight>>>(mm2px(Vec(46.273, 70.133)), module, XLimitJIAutotuner2::BUT5_PARAM, XLimitJIAutotuner2::BUT5_LIGHT));
-		addParam(createLightParamCentered<VCVLightLatch<SmallSimpleLight<WhiteLight>>>(mm2px(Vec(46.273, 77.133)), module, XLimitJIAutotuner2::BUT6_PARAM, XLimitJIAutotuner2::BUT6_LIGHT));
-		addParam(createLightParamCentered<VCVLightLatch<SmallSimpleLight<WhiteLight>>>(mm2px(Vec(46.273, 84.133)), module, XLimitJIAutotuner2::BUT7_PARAM, XLimitJIAutotuner2::BUT7_LIGHT));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(46.273, 35.133)), module, XLimitJIAutotuner2::BUT0_PARAM));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(46.273, 42.133)), module, XLimitJIAutotuner2::BUT1_PARAM));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(46.273, 49.133)), module, XLimitJIAutotuner2::BUT2_PARAM));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(46.273, 56.133)), module, XLimitJIAutotuner2::BUT3_PARAM));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(46.273, 63.133)), module, XLimitJIAutotuner2::BUT4_PARAM));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(46.273, 70.133)), module, XLimitJIAutotuner2::BUT5_PARAM));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(46.273, 77.133)), module, XLimitJIAutotuner2::BUT6_PARAM));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(46.273, 84.133)), module, XLimitJIAutotuner2::BUT7_PARAM));
 
-		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(11.9305, 104.541)), module, XLimitJIAutotuner2::VIN_INPUT));
+		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(13.6305, 106.7995)), module, XLimitJIAutotuner2::VIN_INPUT));
 
-		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(111.132, 104.541)), module, XLimitJIAutotuner2::VOUT_OUTPUT));		
-		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(95.1325, 104.541)), module, XLimitJIAutotuner2::VOUTRES_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(125.9435, 104.541)), module, XLimitJIAutotuner2::VOUT_OUTPUT));		
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(107.9015, 104.541)), module, XLimitJIAutotuner2::VOUTRES_OUTPUT));
 
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(74.232, 17.133)), module, XLimitJIAutotuner2::MONZO_LIGHT));
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(74.232, 35.133)), module, XLimitJIAutotuner2::BOUNDS0_LIGHT));
@@ -689,10 +871,30 @@ struct XLimitJIAutotuner2Widget : ModuleWidget {
 		// mm2px(Vec(42.815, 42.815))
 		addChild(createWidget<Widget>(mm2px(Vec(80.092, 33.092))));
 		
-		TuningCircle2* myWidget = createWidget<TuningCircle2>(mm2px(Vec(79.0, 37.16)));
-		myWidget->setSize(mm2px(Vec(45, 45)));
+		TuningCircle2* myWidget = createWidget<TuningCircle2>(mm2px(Vec(80.0, 31.5)));
+		myWidget->setSize(mm2px(Vec(56.5, 56.5)));
 		myWidget->setModule(module);
 		addChild(myWidget);
+
+		addParam(createLightParamCentered<VCVLightLatch<SmallLight<WhiteLight>>>(mm2px(Vec(132.5, 35.133)), module, XLimitJIAutotuner2::SPACE_PARAM, XLimitJIAutotuner2::SPACE_LIGHT));
+		addParam(createLightParamCentered<VCVLightLatch<MediumLight<WhiteLight>>>(mm2px(Vec(108.25, 59.75)), module, XLimitJIAutotuner2::IMAGE_PARAM, XLimitJIAutotuner2::IMAGE_LIGHT));
+
+	}
+
+	void appendContextMenu(Menu* menu) override {
+		XLimitJIAutotuner2* module = getModule<XLimitJIAutotuner2>();
+
+		menu->addChild(new MenuSeparator);
+
+		// Controls bool Module::loop
+		menu->addChild(createBoolMenuItem("Remap keyboard inputs to tuning circle steps", "",
+			[=]() {
+				return module->isRemap();
+			},
+			[=](bool remap) {
+				module->setRemap(remap);
+			}
+		));
 	}
 };
 
