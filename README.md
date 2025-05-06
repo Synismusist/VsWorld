@@ -71,13 +71,13 @@ Light | Dark
 ## X-Limit JI Autotuner 2
 
 ### 3 - Limit (congruent to Autotuner):
-| Knob 1   | Knob 2   | Knob 3   | Knob 4 |
+| $a_n$ | $b_n$ | $x_{min}$ | $x_{max}$ |
 |----------|----------|----------| --|
 | 2        | 1  | -14  | 14 |
 | 3 | 1 | -6  | 6  |
 
 ### 5 - Limit (congruent to Autotuner):
-| Knob 1 | Knob 2 | Knob 3 | Knob 4 |
+| $a_n$ | $b_n$ | $x_{min}$ | $x_{max}$ |
 |----------|----------|----------|--|
 | 2 | 1 | -10 | 10 |
 | 3 | 1 | -2  | 2  |
@@ -85,7 +85,7 @@ Light | Dark
 
 ### Aloboi's Just Scale:
 https://www.patreon.com/Aloboi/shop/alobend-only-available-for-logic-pro-x-748315
-| Knob 1 | Knob 2 | Knob 3 | Knob 4 |
+| $a_n$ | $b_n$ | $x_{min}$ | $x_{max}$ |
 |----------|----------|----------|--|
 | 2 | 1 | -1 | 1 |
 | 17 | 16 | 0  | 1  |
