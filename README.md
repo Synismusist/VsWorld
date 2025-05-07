@@ -69,45 +69,55 @@ We have now built the pythagorean tuning, where the upper octaves of the root no
 
 | $a_n$ | $b_n$ | $x_{min}$ | $x_{max}$ |
 |----------|----------|----------| --|
-| 2       | 1  | -20  | 10 |
-| 3 | 1 | 0  | 20  |
+| 2       | 1  | -18  | 2 |
+| 3 | 1 | 0  | 12  |
+
+![image](https://github.com/user-attachments/assets/5cfb4cce-0d64-49e8-971a-5ab528cf1d3b)
 
 So, we are able to build full-octavated and half-octavated tuning systems. For non-octavated tuning systems we must dismiss the second harmonic at all leading to more complicated systems.
 Instead of octavating, we can also shift the starting point of the pythagorean comma up and down. The following examples shift it down by 1 octave, once by reassigning bounds and once by directly shifting:
 
 | $a_n$ | $b_n$ | $x_{min}$ | $x_{max}$ |
 |----------|----------|----------| --|
-| 2       | 1  | -21  | -1 |
-| 3 | 1 | 0  | 20  |
+| 2       | 1  | -19  | -1 |
+| 3 | 1 | 0  | 12  |
 
 OR
 
 | $a_n$ | $b_n$ | $s_n$ | $x_{min}$ | $x_{max}$ |
 |----------|----------|-----|-----| --|
-| 2       | 1 | -1 | -20  | 0 |
-| 3 | 1 | 0 | 0  | 20  |
+| 2       | 1 | -1 | -18  | 0 |
+| 3 | 1 | 0 | 0  | 12  |
+
+![image](https://github.com/user-attachments/assets/7c601872-7698-489d-8325-f1d0e9d9b501)
 
 Any tuning system also has a subharmonic side which can be acessed by mirroring the lower and upper bounds of every harmonic in the following way: $[x_{min}, x_{max}] \rightarrow [-x_{max}, -x_{min}]$. Instead of this, it is also possible to just change the harmonics: $[a_n, b_n] \rightarrow [b_n, a_n]$. For the subharmonic pythagorean tuning system we get the following parameters:
 
 | $a_n$ | $b_n$ | $x_{min}$ | $x_{max}$ |
 |----------|----------|----------| --|
-| 2       | 1  | 0  | 20 |
-| 3 | 1 | -20  | 0  |
+| 2       | 1  | 0  | 18 |
+| 3 | 1 | -12  | 0  |
 
 OR
 
 | $a_n$ | $b_n$ | $x_{min}$ | $x_{max}$ |
 |----------|----------|----------| --|
-| 1 | 2 | -20  | 0 |
-| 1 | 3 | 0  | 20  |
+| 1 | 2 | -18  | 0 |
+| 1 | 3 | 0  | 12  |
+
+![image](https://github.com/user-attachments/assets/76f414f5-cc50-4bf0-8af4-fc00460287eb)
+
 
 The pythagorean comma now appears when going down octaves instead of up. How to fix this should be clear by now.
 All of these special pyhtagorean tuning system can be combined into a unified tuning system, where all subsystem can be found:
 
 | $a_n$ | $b_n$ | $x_{min}$ | $x_{max}$ |
 |----------|----------|----------| --|
-| 2 | 1 | -20  | 20 |
-| 3 | 1 | -20  | 20 |
+| 2 | 1 | -18  | 18 |
+| 3 | 1 | -12  | 12 |
+
+![image](https://github.com/user-attachments/assets/b2114231-ca8e-4e5c-b789-676908a38d5e)
+
 
 
 ## X-Limit JI VCO
