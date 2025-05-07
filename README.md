@@ -48,7 +48,7 @@ The Autotuner 2 module is an extension of the first module with more freedom.
 ### How to build a tuning system
 Lets try to build the most simple tuning system: the pythagorean tuning system.
 The pythagorean tuning system builds its frequencies with the following formula: $f = f_0 * \frac{3^p}{2^q}$ , where $p,q$ are natural numbers.
-This means we need the Harmonics 2 and 3, with bounds $0 <= p < \inf$ and $0 <= q < \inf$. Since we cant handle infinities let's choose 18 and 12 as upper bound to fill the first octaves with notes.
+This means we need the Harmonics 2 and 3, with bounds $0 <= p < \inf$ and $0 <= q < \inf$. Since we cant handle infinities let's choose 18 and 12 as upper bounds to fill the first octaves with notes.
 This corresponds to the following parameters:
 
 | $a_n$ | $b_n$ | $x_{min}$ | $x_{max}$ |
