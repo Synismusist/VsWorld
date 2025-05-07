@@ -2,8 +2,11 @@
 
 #include <array>
 #include <vector>
+#include <functional>
 
 struct XLimitJIAutotuner2 : Module {
+	
+	const int64_t VOLTAGELISTLIMIT = 1e6;
 
 	enum ParamId {
 		H0_PARAM,
@@ -52,9 +55,16 @@ struct XLimitJIAutotuner2 : Module {
 		BUT7_PARAM,
 
 		REMAP_PARAM,
+		REMAPKEYS_PARAM,
+
+		GUESS_PARAM,
+		GUESSBOUND_PARAM,
+		EUCLID_PARAM,
+
 		SPACE_PARAM,
 		IMAGE_PARAM,
 		
+		NONE_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -76,20 +86,43 @@ struct XLimitJIAutotuner2 : Module {
 		BOUNDS6_LIGHT,
 		BOUNDS7_LIGHT,
 		MONZO_LIGHT,
+
+		REMAP_LIGHT,
+		
+		GUESS_LIGHT,
+		GAUSS_LIGHT,
+
 		SPACE_LIGHT,
 		IMAGE_LIGHT,
+
 		LIGHTS_LEN
+	};
+
+	struct Monzo {
+		int x0 = 0;
+		int x1 = 0;
+		int x2 = 0;
+		int x3 = 0;
+		int x4 = 0;
+		int x5 = 0;
+		int x6 = 0;
+		int x7 = 0;
+		float euclid = 0.0;
+		float tenney = 0.0;
+		double pitch = 0.0;
 	};
 
 	int mVoltageListZeroIdx = 0;
 	
-	std::vector<double> mVoltageList;
+	std::vector<Monzo> mVoltageList;
 	std::vector<float> mAngles;
 	std::vector<float> mAnglesSpiral;
 	std::vector<float> mAnglesUsed;
 
 	std::array<int, 8> mVoltageSizeList;
 	int64_t mWantedVoltageListSize;
+
+	ParamId mHistoricRemapGuess = NONE_PARAM;
 	
 	std::array<float, 8 * 5> mCurrParams;
 	std::array<float, 8 * 5> mHistoricParams;
@@ -192,6 +225,13 @@ struct XLimitJIAutotuner2 : Module {
 		paramQuantities[BUT7_PARAM]->snapEnabled = true;
 		
 		configSwitch(REMAP_PARAM, 0.f, 1.f, 0.f, "Remap keyoboard inputs to tuning circle steps", {"No","Yes"});
+		configParam(REMAPKEYS_PARAM, 1.f, 100.f, 12.f, "Keyboard keys per octave");
+		paramQuantities[REMAPKEYS_PARAM]->snapEnabled = true;
+		
+		configSwitch(GUESS_PARAM, 0.f, 1.f, 1.f, "Guess correct pitch by choosing monzo with smallest harmonic distance", {"No","Yes"});
+		configParam(GUESSBOUND_PARAM, 1.f, 150.f, 50.f, "Pitch bounds for guessing in +-cents");
+		paramQuantities[GUESSBOUND_PARAM]->snapEnabled = true;
+		configSwitch(EUCLID_PARAM, 0.f, 1.f, 1.f, "Harmonic distance of monzo via", {"Tenney harmonic distance","Euclidean harmonic distance"});
 		
 		configSwitch(SPACE_PARAM, 0.f, 1.f, 0.f, "Tuning steps", {"Pitch space","Frequency space"});
 		configSwitch(IMAGE_PARAM, 0.f, 1.f, 0.f, "Tuning circle", {"Circle (1 Octave)", "Spiral (3 Octaves)"});
@@ -219,14 +259,20 @@ struct XLimitJIAutotuner2 : Module {
 		configInput(VIN_INPUT, "V/Oct");
 		configOutput(VOUT_OUTPUT, "V/Oct");		
 		configOutput(VOUTRES_OUTPUT, "V/Oct residual");
+
+		configBypass(VIN_INPUT, VOUT_OUTPUT);
 		
 		mAnglesUsed.reserve(16);
-		mVoltageList.reserve(1e7);
+		mVoltageList.reserve(VOLTAGELISTLIMIT);
 
 	}
 
 	bool isRemap(){
 		return params[REMAP_PARAM].getValue() == 1.f;
+	}
+	
+	bool isGuess(){
+		return params[GUESS_PARAM].getValue() == 1.f;
 	}
 	
 	void setRemap(bool remap){
@@ -290,6 +336,30 @@ struct XLimitJIAutotuner2 : Module {
 		mCurrParams[37] = params[BUT5_PARAM].getValue();
 		mCurrParams[38] = params[BUT6_PARAM].getValue();
 		mCurrParams[39] = params[BUT7_PARAM].getValue();
+
+		if(params[REMAP_PARAM].getValue() == 1.f && params[GUESS_PARAM].getValue() == 1.f){
+			switch(mHistoricRemapGuess){
+			case REMAP_PARAM:
+				params[REMAP_PARAM].setValue(0.f);
+				break;
+				
+			case GUESS_PARAM:
+				params[GUESS_PARAM].setValue(0.f);
+				break;
+			
+			default:
+				params[REMAP_PARAM].setValue(0.f);
+				params[GUESS_PARAM].setValue(0.f);
+				break;
+			}
+		}
+
+		if(params[REMAP_PARAM].getValue() == 1.f){
+			mHistoricRemapGuess = REMAP_PARAM;
+		}
+		else if(params[GUESS_PARAM].getValue() == 1.f){
+			mHistoricRemapGuess = GUESS_PARAM;
+		} 
 	}
 	
 	void updateVoltageSizeList() {
@@ -303,7 +373,7 @@ struct XLimitJIAutotuner2 : Module {
 		int64_t sz = 1;
 		for(int i = 0; i < 8; i++){
 			sz *= mVoltageSizeList[i];
-			if(sz > 1e7){
+			if(sz > VOLTAGELISTLIMIT){
 				break;
 			}
 		}
@@ -330,7 +400,7 @@ struct XLimitJIAutotuner2 : Module {
 		// check size of voltage list
 		if(!paramsInvalid){
 			updateVoltageSizeList();
-			bool sizeInvalid = mWantedVoltageListSize > 1e7;
+			bool sizeInvalid = mWantedVoltageListSize > VOLTAGELISTLIMIT;
 			lights[MONZO_LIGHT].setBrightness(sizeInvalid ? 1.f : 0.f);
 			paramsInvalid |= sizeInvalid;
 		}
@@ -342,40 +412,35 @@ struct XLimitJIAutotuner2 : Module {
 		mHistoricParams = mCurrParams;
 	}
 	
-	double modelFunD(double v, double x2, double x3, double x5 = 0.0, double x7 = 0.0, double x11 = 0.0, double x13 = 0.0, double x17 = 0.0, double x19 = 0.0) {
-		v += log22 * x2;
-		v += log23 * x3;
-		v += log25 * x5;
-		v += log27 * x7;
-		v += log211 * x11;
-		v += log213 * x13;
-		v += log217 * x17;
-		v += log219 * x19;
-		return v;
-	}
-
-	void filterAngles(std::vector<double>& original, std::vector<float>& filtered, float lowerbound, float upperbound){
+	void filterAngles(std::vector<Monzo>& original, std::vector<float>& filtered, float lowerbound, float upperbound){
 		
-		// Find the range [0, 1) using binary search
-		auto lower = std::lower_bound(original.begin(), original.end(), lowerbound); // First value >= 0
-		auto upper = std::lower_bound(original.begin(), original.end(), upperbound); // First value >= 1	
-		// Copy values in range [0, 1) into the filter vector
+		// Find the range using binary search
+		auto lower = std::lower_bound(original.begin(), original.end(), lowerbound, 
+		[](const Monzo& a, const double& b) { return a.pitch < b; });
+	
+		auto upper = std::lower_bound(original.begin(), original.end(), upperbound, 
+		[](const Monzo& a, const double& b) { return a.pitch < b; });
+		
+		// Copy values in range into the filter vector
 		filtered.clear();
-		filtered.assign(lower, upper);
+		filtered.reserve(std::distance(lower, upper));
+		for (auto it = lower; it != upper; ++it) {
+			filtered.push_back(it->pitch); 
+		}
 	}
 
-	int findClosestToZeroIndex(const std::vector<double>& vec) {
+	int findClosestToZeroIndex(const std::vector<Monzo>& vec) {
 		if (vec.empty()) return -1;  // Handle empty case
 	
 		// Binary search: Find the position where 0 would be inserted
-		auto it = std::lower_bound(vec.begin(), vec.end(), 0.0f);
+		auto it = std::lower_bound(vec.begin(), vec.end(), 0.f, [](const Monzo& a, const float& b) { return a.pitch < b; });
 		
 		if (it == vec.begin()) return 0; // If 0 is before first element
 		if (it == vec.end()) return vec.size() - 1; // If 0 would be placed after last element
 		
 		// Compare previous and current elements to see which is closer to zero
 		int idx = std::distance(vec.begin(), it);
-		if (std::abs(vec[idx]) < std::abs(vec[idx - 1])) return idx;
+		if (std::abs(vec[idx].pitch) < std::abs(vec[idx - 1].pitch)) return idx;
 		else return idx - 1;
 	}
 	
@@ -430,10 +495,61 @@ struct XLimitJIAutotuner2 : Module {
 										+ i13 * size2 * size3 * size5 * size7 * size11
 										+ i17 * size2 * size3 * size5 * size7 * size11 * size13
 										+ i19 * size2 * size3 * size5 * size7 * size11 * size13 * size17;
-										mVoltageList[idx] = modelFunD(0.0, pow2 + i2, pow3 + i3, pow5 + i5, pow7 + i7, pow11 + i11, pow13 + i13, pow17 + i17, pow19 + i19);
+										
+										auto& pitch = mVoltageList[idx].pitch;
+										auto& x0 = mVoltageList[idx].x0;
+										auto& x1 = mVoltageList[idx].x1;
+										auto& x2 = mVoltageList[idx].x2;
+										auto& x3 = mVoltageList[idx].x3;
+										auto& x4 = mVoltageList[idx].x4;
+										auto& x5 = mVoltageList[idx].x5;
+										auto& x6 = mVoltageList[idx].x6;
+										auto& x7 = mVoltageList[idx].x7;
+										auto& euclid = mVoltageList[idx].euclid;
+										auto& tenney = mVoltageList[idx].tenney;
+										
+										x0 = pow2 + i2;
+										x1 = pow3 + i3;
+										x2 = pow5 + i5;
+										x3 = pow7 + i7;
+										x4 = pow11 + i11;
+										x5 = pow13 + i13;
+										x6 = pow17 + i17;
+										x7 = pow19 + i19;
+
+										pitch = ((double)0.0
+										+ x0 * log22 
+										+ x1 * log23
+										+ x2 * log25
+										+ x3 * log27
+										+ x4 * log211
+										+ x5 * log213
+										+ x6 * log217
+										+ x7 * log219);
+										
+										euclid = std::sqrt((double)((int64_t)0
+										+ x0 * x0 
+										+ x1 * x1 
+										+ x2 * x2 
+										+ x3 * x3 
+										+ x4 * x4 
+										+ x5 * x5 
+										+ x6 * x6 
+										+ x7 * x7));
+
+										tenney = ((double)0.0
+										+ std::abs(x0 * log22) 
+										+ std::abs(x1 * log23)
+										+ std::abs(x2 * log25)
+										+ std::abs(x3 * log27)
+										+ std::abs(x4 * log211)
+										+ std::abs(x5 * log213)
+										+ std::abs(x6 * log217)
+										+ std::abs(x7 * log219));
 									}
 
-		std::sort(mVoltageList.begin(), mVoltageList.end());
+		std::sort(mVoltageList.begin(), mVoltageList.end(), 
+		[](const Monzo& a, const Monzo& b) { return a.pitch < b.pitch; });
 
 		filterAngles(mVoltageList, mAngles, 0.f, 1.f);
 		filterAngles(mVoltageList, mAnglesSpiral, -1.001f, 2.f);	
@@ -441,27 +557,70 @@ struct XLimitJIAutotuner2 : Module {
 		mVoltageListZeroIdx = findClosestToZeroIndex(mVoltageList);		
 	}
 
-	double findClosestInSorted(double target) {
-		auto& vec = mVoltageList;
+	float gaussFun(float x, float mu, float var) {
+		//float amp = std::sqrt(2.0 * 3.14159 * var);
+		float diff = x - mu;
+		return std::expf(-(diff * diff) / (2.0 * var));
+	}
 
-		auto lower = std::lower_bound(vec.begin(), vec.end(), target);
+	double findClosestInSorted(double target) {
+		auto& vec = mVoltageList;		
+		if (vec.empty()) return target;  // Handle empty case
+
+		auto lower = std::lower_bound(vec.begin(), vec.end(), target, [](const Monzo& a, const double& b) { return a.pitch < b; });
 	
-		if (lower == vec.end()) return vec.back();  // If target is beyond the last element
-		if (lower == vec.begin()) return vec.front();  // If target is before the first element
+		if (lower == vec.end()) return vec.back().pitch;  // If target is beyond the last element
+		if (lower == vec.begin()) return vec.front().pitch;  // If target is before the first element
 	
 		// Compare the closest values
-		double prev = *(lower - 1);
-		double next = *lower;
+		double prev = (lower - 1)->pitch;
+		double next = lower->pitch;
 	
 		return (std::abs(prev - target) < std::abs(next - target)) ? prev : next;
 	}
+
 	
-	double getFractionalPart(double value) {
-		// Subtrahiere die Ganzzahl-Komponente, um die Nachkommastellen zu erhalten
+
+	double findClosestGuess(double target){
+		auto& vec = mVoltageList;
+		
+		if (vec.empty()) return target;  // Handle empty case
+		
+		auto bounds = params[GUESSBOUND_PARAM].getValue() / 1200.f;
+		bool isEuclid = params[EUCLID_PARAM].getValue() == 1.f;
+
+		auto lower = std::lower_bound(vec.begin(), vec.end(), target - bounds, 
+		[](const Monzo& a, const double& b) { return a.pitch < b; });
+	
+		auto upper = std::lower_bound(vec.begin(), vec.end(), target + bounds, 
+		[](const Monzo& a, const double& b) { return a.pitch < b; });
+
+		auto minValueIt = (isEuclid) 
+    	? std::min_element(lower, upper, [](const Monzo& a, const Monzo& b) {
+			if(a.euclid == b.euclid){
+				return a.tenney < b.tenney;
+			}
+        	return a.euclid < b.euclid;
+    	})
+    	: std::min_element(lower, upper, [](const Monzo& a, const Monzo& b) {
+			if(a.tenney == b.tenney){
+				return a.euclid < b.euclid;
+			}
+        	return a.tenney < b.tenney;
+    	});
+
+   		return minValueIt->pitch; 
+
+	}
+	
+	double getFractionalPart(double value) {		
 		return value - std::floor(value); // Absolutwert für negative Zahlen
 	}
 
 	void updateButtonLights(){		
+		lights[REMAP_LIGHT].setBrightness(params[REMAP_PARAM].getValue() == 1.f);
+		lights[GUESS_LIGHT].setBrightness(params[GUESS_PARAM].getValue() == 1.f);
+		lights[GAUSS_LIGHT].setBrightness(params[EUCLID_PARAM].getValue() == 1.f);
 		lights[SPACE_LIGHT].setBrightness(params[SPACE_PARAM].getValue() == 0.f);
 		lights[IMAGE_LIGHT].setBrightness(params[IMAGE_PARAM].getValue() == 0.f);
 	}
@@ -484,14 +643,15 @@ struct XLimitJIAutotuner2 : Module {
 		mAnglesUsed.resize(channels);
 
 		if(isRemap()){
+			float keysPerOct = params[REMAPKEYS_PARAM].getValue();
 			double currVoltage = inputs[VIN_INPUT].getPolyVoltage(0);
-			int baseIdx = (int)std::round(12.0 * currVoltage);
+			int baseIdx = (int)std::roundf(keysPerOct * currVoltage);
 			int idx = clamp(baseIdx + mVoltageListZeroIdx, 0, mVoltageList.size() - 1);
-			double baseVoltage = mVoltageList[idx];
+			double baseVoltage = mVoltageList[idx].pitch;
 			for (int c = 0; c < channels; c++) {
 				currVoltage = inputs[VIN_INPUT].getPolyVoltage(c);
-				idx = clamp((int)std::round(12.0 * currVoltage) + mVoltageListZeroIdx - baseIdx, 0, mVoltageList.size() - 1);
-				double harmonicVoltage = mVoltageList[idx];
+				idx = clamp((int)std::roundf(keysPerOct * currVoltage) + mVoltageListZeroIdx - baseIdx, 0, mVoltageList.size() - 1);
+				double harmonicVoltage = mVoltageList[idx].pitch;
 				mAnglesUsed[c] = harmonicVoltage;
 				double vout = clampD(baseVoltage + harmonicVoltage, -10.0, 10.0);
 				float voutF = static_cast<float>(vout);			
@@ -499,12 +659,17 @@ struct XLimitJIAutotuner2 : Module {
 				outputs[VOUT_OUTPUT].setVoltage(voutF, c);
 				outputs[VOUTRES_OUTPUT].setVoltage(voutR, c);
 			}			
-		} 		
+		} 
 		else {
 			double baseVoltage = inputs[VIN_INPUT].getPolyVoltage(0);
+			double harmonicVoltage = 0.0;
 			for (int c = 0; c < channels; c++) {
 				double currVoltage = inputs[VIN_INPUT].getPolyVoltage(c);
-				double harmonicVoltage = findClosestInSorted(currVoltage - baseVoltage);
+				if(isGuess()){
+					harmonicVoltage = findClosestGuess(currVoltage - baseVoltage);
+				} else {
+					harmonicVoltage = findClosestInSorted(currVoltage - baseVoltage);
+				}
 				mAnglesUsed[c] = harmonicVoltage;
 				double vout = clampD(baseVoltage + harmonicVoltage, -10.0, 10.0);
 				float voutF = static_cast<float>(vout);			
@@ -545,7 +710,6 @@ struct TuningCircle2 : LedDisplay {
 	}
 	
 	double getFractionalPart(double value) {
-		// Subtrahiere die Ganzzahl-Komponente, um die Nachkommastellen zu erhalten
 		return value - std::floor(value); // Absolutwert für negative Zahlen
 	}
 	
@@ -852,7 +1016,7 @@ struct XLimitJIAutotuner2Widget : ModuleWidget {
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(46.273, 70.133)), module, XLimitJIAutotuner2::BUT5_PARAM));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(46.273, 77.133)), module, XLimitJIAutotuner2::BUT6_PARAM));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(46.273, 84.133)), module, XLimitJIAutotuner2::BUT7_PARAM));
-
+		
 		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(13.6305, 106.7995)), module, XLimitJIAutotuner2::VIN_INPUT));
 
 		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(125.9435, 104.541)), module, XLimitJIAutotuner2::VOUT_OUTPUT));		
@@ -876,26 +1040,18 @@ struct XLimitJIAutotuner2Widget : ModuleWidget {
 		myWidget->setModule(module);
 		addChild(myWidget);
 
-		addParam(createLightParamCentered<VCVLightLatch<SmallLight<WhiteLight>>>(mm2px(Vec(132.5, 35.133)), module, XLimitJIAutotuner2::SPACE_PARAM, XLimitJIAutotuner2::SPACE_LIGHT));
-		addParam(createLightParamCentered<VCVLightLatch<MediumLight<WhiteLight>>>(mm2px(Vec(108.25, 59.75)), module, XLimitJIAutotuner2::IMAGE_PARAM, XLimitJIAutotuner2::IMAGE_LIGHT));
+		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(29.1325, 115.1325)), module, XLimitJIAutotuner2::REMAP_PARAM, XLimitJIAutotuner2::REMAP_LIGHT));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(39.1325, 115.1325)), module, XLimitJIAutotuner2::REMAPKEYS_PARAM));
+
+		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(29.1325, 99.6325)), module, XLimitJIAutotuner2::GUESS_PARAM, XLimitJIAutotuner2::GUESS_LIGHT));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(39.1325, 99.6325)), module, XLimitJIAutotuner2::GUESSBOUND_PARAM));
+		addParam(createLightParamCentered<VCVLightLatch<SmallSimpleLight<WhiteLight>>>(mm2px(Vec(49.1325, 99.6325)), module, XLimitJIAutotuner2::EUCLID_PARAM, XLimitJIAutotuner2::GAUSS_LIGHT));
+
+		addParam(createLightParamCentered<VCVLightLatch<SmallSimpleLight<WhiteLight>>>(mm2px(Vec(132.5, 35.133)), module, XLimitJIAutotuner2::SPACE_PARAM, XLimitJIAutotuner2::SPACE_LIGHT));
+		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(108.25, 59.75)), module, XLimitJIAutotuner2::IMAGE_PARAM, XLimitJIAutotuner2::IMAGE_LIGHT));
 
 	}
 
-	void appendContextMenu(Menu* menu) override {
-		XLimitJIAutotuner2* module = getModule<XLimitJIAutotuner2>();
-
-		menu->addChild(new MenuSeparator);
-
-		// Controls bool Module::loop
-		menu->addChild(createBoolMenuItem("Remap keyboard inputs to tuning circle steps", "",
-			[=]() {
-				return module->isRemap();
-			},
-			[=](bool remap) {
-				module->setRemap(remap);
-			}
-		));
-	}
 };
 
 
