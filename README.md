@@ -48,23 +48,32 @@ The Autotuner 2 module is an extension of the first module with more freedom.
 ### How to build a tuning system
 Lets try to build the most simple tuning system: the pythagorean tuning system.
 The pythagorean tuning system builds its frequencies with the following formula: $f = f_0 * \frac{3^p}{2^q}$ , where $p,q$ are natural numbers.
-This means we need the Harmonics 2 and 3, with bounds $0 <= p < \inf$ and $0 <= q < \inf$. Since we cant handle infinities let's choose 20 as upper bound.
+This means we need the Harmonics 2 and 3, with bounds $0 <= p < \inf$ and $0 <= q < \inf$. Since we cant handle infinities let's choose 18 and 12 as upper bound to fill the first octave with notes.
 This corresponds to the following parameters:
 
 | $a_n$ | $b_n$ | $x_{min}$ | $x_{max}$ |
 |----------|----------|----------| --|
-| 2       | 1  | -20  | 0 |
-| 3 | 1 | 0  | 20  |
+| 1 | 2  | 0  | 18 |
+| 3 | 1 | 0  | 12  |
 
-We have now built the pythagorean tuning, where the upper octaves of the root note are pitch shifted by the pythagorean comma. To fix this, we can allow going up octaves by changing the bounds for the second harmonic:
+OR
+
+| $a_n$ | $b_n$ | $x_{min}$ | $x_{max}$ |
+|----------|----------|----------| --|
+| 2       | 1  | -18  | 0 |
+| 3 | 1 | 0  | 12  |
+
+![image](https://github.com/user-attachments/assets/3ef2507d-9e53-4600-b27d-e93854845e7d)
+
+We have now built the pythagorean tuning, where the upper octaves of the root note (black line in upper image) are pitch shifted by the pythagorean comma. To fix this, we can allow going up octaves by changing the bounds for the second harmonic:
 
 | $a_n$ | $b_n$ | $x_{min}$ | $x_{max}$ |
 |----------|----------|----------| --|
 | 2       | 1  | -20  | 10 |
 | 3 | 1 | 0  | 20  |
 
-So we are able to build octaveted and non-octaveted tuning systems.
-Insted of octaveting, we can also shift the starting point of the pythagorean comma up and down. The following examples shift it down by 1 octave, once by reassigning bounds and once by directly shifting:
+So, we are able to build full-octavated and half-octavated tuning systems. For non-octavated tuning systems we must dismiss the second harmonic at all leading to more complicated systems.
+Instead of octavating, we can also shift the starting point of the pythagorean comma up and down. The following examples shift it down by 1 octave, once by reassigning bounds and once by directly shifting:
 
 | $a_n$ | $b_n$ | $x_{min}$ | $x_{max}$ |
 |----------|----------|----------| --|
