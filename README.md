@@ -11,7 +11,7 @@ The math needed to understand the module is the following:
 
 > Let $f_0$ be the starting frequency from which an allowed frequency $f$ can be derived by:
 > 
-> $f = f_0 * 2^{x_0} * 3^{x_1} * 5^{x_2} * 7^{x_3} * 11^{x_4} * 13^{x_5} * 17^{x_6} * 19^{x_7}$
+> $f = f_0 \cdot 2^{x_0} \cdot 3^{x_1} \cdot 5^{x_2} \cdot 7^{x_3} \cdot 11^{x_4} \cdot 13^{x_5} \cdot 17^{x_6} \cdot 19^{x_7}$
 >    
 > Getting from frequency to voltage:
 >
@@ -19,7 +19,7 @@ The math needed to understand the module is the following:
 >
 > Which leads to the final expression:
 >
-> $v = v_0 + {x_0} * log_2(2) + {x_1} * log_2(3) + {x_2} * log_2(5) + {x_3} * log_2(7) + {x_4} * log_2(11) + {x_5} * log_2(13) + {x_6} * log_2(17) + {x_7} * log_2(19) $
+> $v = v_0 + {x_0} \cdot log_2(2) + {x_1} \cdot log_2(3) + {x_2} \cdot log_2(5) + {x_3} \cdot log_2(7) + {x_4} \cdot log_2(11) + {x_5} \cdot log_2(13) + {x_6} \cdot log_2(17) + {x_7} \cdot log_2(19) $
 >
 > $v_0$ and $v$ are given by the voltage in the first and $i$ th input channel.
 > The vector $\vec{x} = (x_0, x_1, x_2, ...)$ is called monzo.
@@ -47,7 +47,7 @@ The Autotuner 2 module is an extension of the first module with more freedom.
 
 ### How to build a tuning system
 Lets try to build the most simple tuning system: the pythagorean tuning system.
-The pythagorean tuning system builds its frequencies with the following formula: $f = f_0 * \frac{3^p}{2^q}$ , where $p,q$ are natural numbers.
+The pythagorean tuning system builds its frequencies with the following formula: $f = f_0 \cdot \frac{3^p}{2^q}$ , where $p,q$ are natural numbers.
 This means we need the Harmonics 2 and 3, with bounds $0 <= p < \inf$ and $0 <= q < \inf$. Since we cant handle infinities let's choose 18 and 12 as upper bounds to fill the first octaves with notes.
 This corresponds to the following parameters:
 
@@ -91,7 +91,7 @@ OR
 
 ![image](https://github.com/user-attachments/assets/7c601872-7698-489d-8325-f1d0e9d9b501)
 
-Any tuning system also has a subharmonic side which can be acessed by switching the harmonics. The subharmonic pythagorean tuning system now uses the following formula to generate frequencies: $f = f_0 * \frac{3^{-p}}{2^{-q}} = \frac{2^{q}}{3^{p}}$. This leads to the following parameters:
+Any tuning system also has a subharmonic side which can be acessed by switching the harmonics. The subharmonic pythagorean tuning system now uses the following formula to generate frequencies: $f = f_0 \cdot \frac{2^{q}}{3^{p}} = f_0 \cdot \frac{3^{-p}}{2^{-q}}$. This leads to the following parameters:
 
 | $a_n$ | $b_n$ | $x_{min}$ | $x_{max}$ |
 |----------|----------|----------| --|
