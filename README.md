@@ -65,7 +65,7 @@ OR
 
 ![image](https://github.com/user-attachments/assets/3ef2507d-9e53-4600-b27d-e93854845e7d)
 
-We have now built the pythagorean tuning, where the upper octaves of the root note (black line in upper image) are pitch shifted by the pythagorean comma. To fix this, we can allow going up octaves by changing the bounds for the second harmonic:
+We have now built the pythagorean tuning, where the upper octaves of the root note (difference between black line and red line in upper image of the tuning circle) are pitch shifted by the pythagorean comma. To fix this, we can allow going up octaves by changing the bounds for the second harmonic:
 
 | $a_n$ | $b_n$ | $x_{min}$ | $x_{max}$ |
 |----------|----------|----------| --|
