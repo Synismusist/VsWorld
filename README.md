@@ -74,7 +74,7 @@ Insted of octaveting, we can also shift the starting point of the pythagorean co
 OR
 
 | $a_n$ | $b_n$ | $s_n$| $x_{min}$ | $x_{max}$ |
-|----------|----------|----------| --|
+|----------|----------|-----|-----| --|
 | 2       | 1 | -1 | -20  | 0 |
 | 3 | 1 | 0 | 0  | 20  |
 
