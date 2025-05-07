@@ -91,7 +91,7 @@ OR
 
 ![image](https://github.com/user-attachments/assets/7c601872-7698-489d-8325-f1d0e9d9b501)
 
-Any tuning system also has a subharmonic side which can be acessed by mirroring the lower and upper bounds of every harmonic in the following way: $[x_{min}, x_{max}] \rightarrow [-x_{max}, -x_{min}]$. Instead of this, it is also possible to just change the harmonics: $[a_n, b_n] \rightarrow [b_n, a_n]$. For the subharmonic pythagorean tuning system we get the following parameters:
+Any tuning system also has a subharmonic side which can be acessed by switching the harmonics. The subharmonic pythagorean tuning system now uses the following formula to generate frequencies: $f = f_0 * \frac{3^{-p}}{2^{-q} = \frac{2^{q}}{3^{p}$. This leads to the following parameters:
 
 | $a_n$ | $b_n$ | $x_{min}$ | $x_{max}$ |
 |----------|----------|----------| --|
