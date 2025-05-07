@@ -74,7 +74,7 @@ We have now built the pythagorean tuning, where the upper octaves of the root no
 
 ![image](https://github.com/user-attachments/assets/5cfb4cce-0d64-49e8-971a-5ab528cf1d3b)
 
-So, we are able to build full-octavated and half-octavated tuning systems. For non-octavated tuning systems we must dismiss the second harmonic at all leading to more complicated systems.
+So, we are able to build full-octavated and half-octavated tuning systems. For non-octavated tuning systems we must dismiss the second harmonic at all, leading to more complicated systems.
 Instead of octavating, we can also shift the starting point of the pythagorean comma up and down. The following examples shift it down by 1 octave, once by reassigning bounds and once by directly shifting:
 
 | $a_n$ | $b_n$ | $x_{min}$ | $x_{max}$ |
