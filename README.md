@@ -63,16 +63,17 @@ OR
 | 2       | 1  | -18  | 0 |
 | 3 | 1 | 0  | 12  |
 
-![image](https://github.com/user-attachments/assets/3ef2507d-9e53-4600-b27d-e93854845e7d)
+![image](https://github.com/user-attachments/assets/24e4c99b-1fb0-4e48-a44b-fdb679580055)
 
-We have now built the pythagorean tuning, where the upper octaves of the root note (difference between black line and red line in upper image of the tuning circle) are pitch shifted by the pythagorean comma. To fix this, we can allow going up octaves by changing the bounds for the second harmonic:
+
+We have now built the pythagorean tuning, where the upper octaves of the root note are pitch shifted by the pythagorean comma (difference between white line and red line in upper image of the tuning circle). To fix this, we can allow going up octaves by changing the bounds for the second harmonic:
 
 | $a_n$ | $b_n$ | $x_{min}$ | $x_{max}$ |
 |----------|----------|----------| --|
 | 2       | 1  | -18  | 2 |
 | 3 | 1 | 0  | 12  |
 
-![image](https://github.com/user-attachments/assets/5cfb4cce-0d64-49e8-971a-5ab528cf1d3b)
+![image](https://github.com/user-attachments/assets/101cca82-7ad5-4260-81bf-945ee07f0f4c)
 
 So, we are able to build full-octavated and half-octavated tuning systems. For non-octavated tuning systems we must dismiss the second harmonic at all, leading to more complicated systems.
 Instead of octavating, we can also shift the starting point of the pythagorean comma up and down. The following examples shift it down by 1 octave, once by reassigning bounds and once by directly shifting:
@@ -89,7 +90,7 @@ OR
 | 2       | 1 | -1 | -18  | 0 |
 | 3 | 1 | 0 | 0  | 12  |
 
-![image](https://github.com/user-attachments/assets/7c601872-7698-489d-8325-f1d0e9d9b501)
+![image](https://github.com/user-attachments/assets/d2eaa3fd-f0d4-43b3-a7c9-d1ccaff7b03b)
 
 Any tuning system also has a subharmonic side which can be acessed by switching the harmonics. The subharmonic pythagorean tuning system then uses the following formula to generate frequencies: $f = f_0 \cdot \frac{2^{q}}{3^{p}} = f_0 \cdot \frac{3^{-p}}{2^{-q}}$. This means we just have to switch the bounds $[x_{min},x_{max}] \rightarrow [-x_{max}, -x_{min}]$ or switch the harmonics $[a_n,b_n]\rightarrow [b_n,a_n]$ to get to our new system, which leads to the following parameters:
 
@@ -105,8 +106,7 @@ OR
 | 1 | 2 | -18  | 0 |
 | 1 | 3 | 0  | 12  |
 
-![image](https://github.com/user-attachments/assets/76f414f5-cc50-4bf0-8af4-fc00460287eb)
-
+![image](https://github.com/user-attachments/assets/fa92c275-e448-427d-adab-4a5f17c7dd97)
 
 The pythagorean comma now appears when going down octaves instead of up. How to fix this should be clear by now.
 All of these special pyhtagorean tuning system can be combined into a unified tuning system, where all subsystem can be found:
@@ -116,7 +116,7 @@ All of these special pyhtagorean tuning system can be combined into a unified tu
 | 2 | 1 | -18  | 18 |
 | 3 | 1 | -12  | 12 |
 
-![image](https://github.com/user-attachments/assets/b2114231-ca8e-4e5c-b789-676908a38d5e)
+![image](https://github.com/user-attachments/assets/70f0b208-404e-4fea-846d-05e76093e9d8)
 
 
 
