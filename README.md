@@ -80,10 +80,7 @@ OR
 
 Any tuning system also has a subharmonic side which can be acessed by mirroring the lower and upper bounds of every harmonic in the following way: $[x_{min, x_{max}] -> [-x_{max}, -x_{min}]$. Insted of this, it is also possible to just change the harmonics: $[a_n, b_n] -> [b_n, a_n]$. For the subharmonic pythagorean tuning system we get the following parameters:
 
-| $a_n$ | $b_n$ | $x_{min}$ | $x_{max}$ |
-|----------|----------|----------| --|
-| 2       | 1  | 0  | 20 |
-| 3 | 1 | -20  | 0  |
+
 
 OR
 
