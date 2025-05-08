@@ -43,7 +43,7 @@ For more information, check out this article from Felix Roos: https://loophole-l
 Many presets are built from the lists in the article.
 
 ## X-Limit JI Autotuner 2
-The Autotuner 2 module is an extension of the first module with more freedom. 
+The Autotuner 2 module is an extension of the first module with more freedom and features. 
 
 ### How to build a tuning system
 Lets try to build the most simple tuning system: the pythagorean tuning system.
