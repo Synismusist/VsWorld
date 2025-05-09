@@ -8,7 +8,7 @@
    version="1.1"
    id="svg1"
    inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
-   sodipodi:docname="XLimitJIAutotuner-dark.svg"
+   sodipodi:docname="XLimitJIAutotuner2-dark.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -23,15 +23,15 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="1.2448312"
-     inkscape:cx="152.63114"
-     inkscape:cy="201.2321"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="149.19953"
+     inkscape:cy="250.66935"
      inkscape:window-width="1920"
      inkscape:window-height="1111"
      inkscape:window-x="-9"
      inkscape:window-y="-9"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer1" />
+     inkscape:current-layer="layer2" />
   <defs
      id="defs1">
     <inkscape:perspective
@@ -532,6 +532,20 @@
        height="7.2026415"
        x="4.1486793"
        y="80.648674" />
+    <rect
+       style="fill:#aa00ff;fill-opacity:1;stroke:#aa00ff;stroke-width:0.226272;stroke-opacity:1"
+       id="rect7"
+       width="10.773728"
+       height="0.13872701"
+       x="28.874348"
+       y="99.586914" />
+    <rect
+       style="fill:#aa00ff;stroke:#aa00ff;stroke-width:0.225378;stroke-opacity:1;fill-opacity:1"
+       id="rect7-8"
+       width="10.620322"
+       height="0.139621"
+       x="28.817406"
+       y="115.20644" />
     <g
        inkscape:label=""
        transform="translate(25.999999,89.040885)"

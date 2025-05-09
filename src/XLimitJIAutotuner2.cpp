@@ -2,9 +2,11 @@
 
 #include <array>
 #include <vector>
-#include <functional>
+#include <unordered_map>
 
 struct XLimitJIAutotuner2 : Module {
+
+	using PrimeExponentMap = std::unordered_map<int,int>;
 	
 	const int64_t VOLTAGELISTLIMIT = 1e6;
 
@@ -90,7 +92,7 @@ struct XLimitJIAutotuner2 : Module {
 		REMAP_LIGHT,
 		
 		GUESS_LIGHT,
-		GAUSS_LIGHT,
+		EUCLID_LIGHT,
 
 		SPACE_LIGHT,
 		IMAGE_LIGHT,
@@ -126,6 +128,8 @@ struct XLimitJIAutotuner2 : Module {
 	
 	std::array<float, 8 * 5> mCurrParams;
 	std::array<float, 8 * 5> mHistoricParams;
+
+	std::array<PrimeExponentMap, 8> mPrimeExponentMaps;
 	
 	double log22 = std::log2(2.0);
 	double log23 = std::log2(3.0);
@@ -231,7 +235,7 @@ struct XLimitJIAutotuner2 : Module {
 		configSwitch(GUESS_PARAM, 0.f, 1.f, 1.f, "Guess correct pitch by choosing monzo with smallest harmonic distance", {"No","Yes"});
 		configParam(GUESSBOUND_PARAM, 1.f, 150.f, 50.f, "Pitch bounds for guessing in +-cents");
 		paramQuantities[GUESSBOUND_PARAM]->snapEnabled = true;
-		configSwitch(EUCLID_PARAM, 0.f, 1.f, 1.f, "Harmonic distance of monzo via", {"Tenney harmonic distance","Euclidean harmonic distance"});
+		configSwitch(EUCLID_PARAM, 0.f, 1.f, 0.f, "Harmonic distance of monzo via", {"Tenney harmonic distance","Euclidean harmonic distance"});
 		
 		configSwitch(SPACE_PARAM, 0.f, 1.f, 0.f, "Tuning steps", {"Pitch space","Frequency space"});
 		configSwitch(IMAGE_PARAM, 0.f, 1.f, 0.f, "Tuning circle", {"Circle (1 Octave)", "Spiral (3 Octaves)"});
@@ -265,6 +269,37 @@ struct XLimitJIAutotuner2 : Module {
 		mAnglesUsed.reserve(16);
 		mVoltageList.reserve(VOLTAGELISTLIMIT);
 
+	}
+
+	template <typename T>
+	T pow2(const T& a) {
+		return a*a;
+	}
+
+	float tennyDist(const Monzo& a, const Monzo& b) {
+		double dist = 0.0;
+		dist += std::abs((a.x0 - b.x0) * log22);
+		dist += std::abs((a.x1 - b.x1) * log23);
+		dist += std::abs((a.x2 - b.x2) * log25);
+		dist += std::abs((a.x3 - b.x3) * log27);
+		dist += std::abs((a.x4 - b.x4) * log211);
+		dist += std::abs((a.x5 - b.x5) * log213);
+		dist += std::abs((a.x6 - b.x6) * log217);
+		dist += std::abs((a.x7 - b.x7) * log219);
+		return dist; 
+	}
+
+	float euclidDist(const Monzo& a, const Monzo& b) {
+		double dist = 0.0;
+		dist += pow2(a.x0 - b.x0);
+		dist += pow2(a.x1 - b.x1);
+		dist += pow2(a.x2 - b.x2);
+		dist += pow2(a.x3 - b.x3);
+		dist += pow2(a.x4 - b.x4);
+		dist += pow2(a.x5 - b.x5);
+		dist += pow2(a.x6 - b.x6);
+		dist += pow2(a.x7 - b.x7);
+		return std::sqrt(dist); 
 	}
 
 	bool isRemap(){
@@ -401,6 +436,11 @@ struct XLimitJIAutotuner2 : Module {
 		if(!paramsInvalid){
 			updateVoltageSizeList();
 			bool sizeInvalid = mWantedVoltageListSize > VOLTAGELISTLIMIT;
+			if(sizeInvalid) {
+				for(int i = 0; i < 8; i++){
+					lights[i].setBrightness(1.f);
+				}
+			}
 			lights[MONZO_LIGHT].setBrightness(sizeInvalid ? 1.f : 0.f);
 			paramsInvalid |= sizeInvalid;
 		}
@@ -443,6 +483,59 @@ struct XLimitJIAutotuner2 : Module {
 		if (std::abs(vec[idx].pitch) < std::abs(vec[idx - 1].pitch)) return idx;
 		else return idx - 1;
 	}
+
+	void primeFactorization(PrimeExponentMap& factors, int n, int sign) {	
+		if(n < 2){
+			return;
+		}
+		// Factor out all 2s
+		while (n % 2 == 0) {
+			factors[2] += sign * 1;
+			n /= 2;
+		}
+	
+		// Check odd numbers up to sqrt(n)
+		for (int i = 3; i * i <= n; i += 2) {
+			while (n % i == 0) {
+				factors[i] += sign * 1;
+				n /= i;
+			}
+		}
+	
+		// If n is still greater than 1, it's a prime
+		if (n > 1) {
+			factors[n] += sign * 1;
+		}
+	}
+
+	PrimeExponentMap monzoPrimes(const Monzo& m) {
+		PrimeExponentMap map;
+		const int* x = &(m.x0);
+
+		for(int ii = 0; ii < 8; ii++) {
+			for(auto& pair : mPrimeExponentMaps[ii]){
+				map[pair.first] += x[ii] * pair.second; // prime_base ^ (x * exponent)
+			}
+		}
+
+		return map;
+	}
+
+	float tenneyDist(PrimeExponentMap map) {
+		double tenney = 0.0;		
+		for(auto& pair : map){
+			tenney += std::log2(pair.first) * std::abs(pair.second);
+		}
+		return tenney;
+	}
+	
+	float euclidDist(PrimeExponentMap map) {
+		double euclid = 0.0;		
+		for(auto& pair : map){
+			euclid += std::log2(pair.first) * (pair.second * pair.second);
+		}
+		return std::sqrt(euclid);
+	}
 	
 	void buildVoltageList(){
 		float* hPtr = &(mCurrParams[0]);
@@ -451,6 +544,13 @@ struct XLimitJIAutotuner2 : Module {
 		float* shPtr = &(mCurrParams[32]);
 
 		mVoltageList.resize(mWantedVoltageListSize);
+
+		for(int ii = 0; ii < 8; ii++) {
+			auto& map = mPrimeExponentMaps[ii];
+			map.clear();
+			primeFactorization(map, hPtr[ii], +1);
+			primeFactorization(map, sPtr[ii], -1);
+		}
 		
 		log22 = std::log2((double)hPtr[0] / (double)sPtr[0]);
 		log23 = std::log2((double)hPtr[1] / (double)sPtr[1]);
@@ -478,6 +578,8 @@ struct XLimitJIAutotuner2 : Module {
 		int pow13 = lbPtr[5] + shPtr[5];
 		int pow17 = lbPtr[6] + shPtr[6];
 		int pow19 = lbPtr[7] + shPtr[7];
+
+		PrimeExponentMap distMap;
 
 		for(int i2 = 0; i2 < size2; i2++)
 			for(int i3 = 0; i3 < size3; i3++)
@@ -526,26 +628,11 @@ struct XLimitJIAutotuner2 : Module {
 										+ x5 * log213
 										+ x6 * log217
 										+ x7 * log219);
-										
-										euclid = std::sqrt((double)((int64_t)0
-										+ x0 * x0 
-										+ x1 * x1 
-										+ x2 * x2 
-										+ x3 * x3 
-										+ x4 * x4 
-										+ x5 * x5 
-										+ x6 * x6 
-										+ x7 * x7));
 
-										tenney = ((double)0.0
-										+ std::abs(x0 * log22) 
-										+ std::abs(x1 * log23)
-										+ std::abs(x2 * log25)
-										+ std::abs(x3 * log27)
-										+ std::abs(x4 * log211)
-										+ std::abs(x5 * log213)
-										+ std::abs(x6 * log217)
-										+ std::abs(x7 * log219));
+										distMap.clear();
+										distMap = monzoPrimes(mVoltageList[idx]);
+										euclid = euclidDist(distMap);
+										tenney = tenneyDist(distMap);
 									}
 
 		std::sort(mVoltageList.begin(), mVoltageList.end(), 
@@ -578,8 +665,6 @@ struct XLimitJIAutotuner2 : Module {
 	
 		return (std::abs(prev - target) < std::abs(next - target)) ? prev : next;
 	}
-
-	
 
 	double findClosestGuess(double target){
 		auto& vec = mVoltageList;
@@ -620,7 +705,7 @@ struct XLimitJIAutotuner2 : Module {
 	void updateButtonLights(){		
 		lights[REMAP_LIGHT].setBrightness(params[REMAP_PARAM].getValue() == 1.f);
 		lights[GUESS_LIGHT].setBrightness(params[GUESS_PARAM].getValue() == 1.f);
-		lights[GAUSS_LIGHT].setBrightness(params[EUCLID_PARAM].getValue() == 1.f);
+		lights[EUCLID_LIGHT].setBrightness(params[EUCLID_PARAM].getValue() == 0.f);
 		lights[SPACE_LIGHT].setBrightness(params[SPACE_PARAM].getValue() == 0.f);
 		lights[IMAGE_LIGHT].setBrightness(params[IMAGE_PARAM].getValue() == 0.f);
 	}
@@ -665,7 +750,7 @@ struct XLimitJIAutotuner2 : Module {
 			double harmonicVoltage = 0.0;
 			for (int c = 0; c < channels; c++) {
 				double currVoltage = inputs[VIN_INPUT].getPolyVoltage(c);
-				if(isGuess()){
+				if(isGuess()) {
 					harmonicVoltage = findClosestGuess(currVoltage - baseVoltage);
 				} else {
 					harmonicVoltage = findClosestInSorted(currVoltage - baseVoltage);
@@ -1045,7 +1130,7 @@ struct XLimitJIAutotuner2Widget : ModuleWidget {
 
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(29.1325, 99.6325)), module, XLimitJIAutotuner2::GUESS_PARAM, XLimitJIAutotuner2::GUESS_LIGHT));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(39.1325, 99.6325)), module, XLimitJIAutotuner2::GUESSBOUND_PARAM));
-		addParam(createLightParamCentered<VCVLightLatch<SmallSimpleLight<WhiteLight>>>(mm2px(Vec(49.1325, 99.6325)), module, XLimitJIAutotuner2::EUCLID_PARAM, XLimitJIAutotuner2::GAUSS_LIGHT));
+		//addParam(createLightParamCentered<VCVLightLatch<SmallSimpleLight<WhiteLight>>>(mm2px(Vec(49.1325, 99.6325)), module, XLimitJIAutotuner2::EUCLID_PARAM, XLimitJIAutotuner2::EUCLID_LIGHT));
 
 		addParam(createLightParamCentered<VCVLightLatch<SmallSimpleLight<WhiteLight>>>(mm2px(Vec(132.5, 35.133)), module, XLimitJIAutotuner2::SPACE_PARAM, XLimitJIAutotuner2::SPACE_LIGHT));
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(108.25, 59.75)), module, XLimitJIAutotuner2::IMAGE_PARAM, XLimitJIAutotuner2::IMAGE_LIGHT));
