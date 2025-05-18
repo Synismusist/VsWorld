@@ -109,7 +109,6 @@ struct XLimitJIAutotuner2 : Module {
 		int x5 = 0;
 		int x6 = 0;
 		int x7 = 0;
-		float euclid = 0.0;
 		float tenney = 0.0;
 		double pitch = 0.0;
 	};
@@ -177,65 +176,65 @@ struct XLimitJIAutotuner2 : Module {
 		configParam(S7_PARAM, 1.f, 1024.f, 1.f, "Subharmonic");
 		paramQuantities[S7_PARAM]->snapEnabled = true;
 		
-		configParam(LB0_PARAM, -100.f, 100.f, 0.f, "Lower Bound");
+		configParam(LB0_PARAM, -30.f, 30.f, 0.f, "Lower Bound");
 		paramQuantities[LB0_PARAM]->snapEnabled = true;
-		configParam(LB1_PARAM, -100.f, 100.f, 0.f, "Lower Bound");
+		configParam(LB1_PARAM, -30.f, 30.f, 0.f, "Lower Bound");
 		paramQuantities[LB1_PARAM]->snapEnabled = true;
-		configParam(LB2_PARAM, -100.f, 100.f, 0.f, "Lower Bound");
+		configParam(LB2_PARAM, -30.f, 30.f, 0.f, "Lower Bound");
 		paramQuantities[LB2_PARAM]->snapEnabled = true;
-		configParam(LB3_PARAM, -100.f, 100.f, 0.f, "Lower Bound");
+		configParam(LB3_PARAM, -30.f, 30.f, 0.f, "Lower Bound");
 		paramQuantities[LB3_PARAM]->snapEnabled = true;
-		configParam(LB4_PARAM, -100.f, 100.f, 0.f, "Lower Bound");
+		configParam(LB4_PARAM, -30.f, 30.f, 0.f, "Lower Bound");
 		paramQuantities[LB4_PARAM]->snapEnabled = true;
-		configParam(LB5_PARAM, -100.f, 100.f, 0.f, "Lower Bound");
+		configParam(LB5_PARAM, -30.f, 30.f, 0.f, "Lower Bound");
 		paramQuantities[LB5_PARAM]->snapEnabled = true;
-		configParam(LB6_PARAM, -100.f, 100.f, 0.f, "Lower Bound");
+		configParam(LB6_PARAM, -30.f, 30.f, 0.f, "Lower Bound");
 		paramQuantities[LB6_PARAM]->snapEnabled = true;
-		configParam(LB7_PARAM, -100.f, 100.f, 0.f, "Lower Bound");
+		configParam(LB7_PARAM, -30.f, 30.f, 0.f, "Lower Bound");
 		paramQuantities[LB7_PARAM]->snapEnabled = true;
 		
-		configParam(UB0_PARAM, -100.f, 100.f, 0.f, "Upper Bound");
+		configParam(UB0_PARAM, -30.f, 30.f, 0.f, "Upper Bound");
 		paramQuantities[UB0_PARAM]->snapEnabled = true;
-		configParam(UB1_PARAM, -100.f, 100.f, 0.f, "Upper Bound");
+		configParam(UB1_PARAM, -30.f, 30.f, 0.f, "Upper Bound");
 		paramQuantities[UB1_PARAM]->snapEnabled = true;
-		configParam(UB2_PARAM, -100.f, 100.f, 0.f, "Upper Bound");
+		configParam(UB2_PARAM, -30.f, 30.f, 0.f, "Upper Bound");
 		paramQuantities[UB2_PARAM]->snapEnabled = true;
-		configParam(UB3_PARAM, -100.f, 100.f, 0.f, "Upper Bound");
+		configParam(UB3_PARAM, -30.f, 30.f, 0.f, "Upper Bound");
 		paramQuantities[UB3_PARAM]->snapEnabled = true;
-		configParam(UB4_PARAM, -100.f, 100.f, 0.f, "Upper Bound");
+		configParam(UB4_PARAM, -30.f, 30.f, 0.f, "Upper Bound");
 		paramQuantities[UB4_PARAM]->snapEnabled = true;
-		configParam(UB5_PARAM, -100.f, 100.f, 0.f, "Upper Bound");
+		configParam(UB5_PARAM, -30.f, 30.f, 0.f, "Upper Bound");
 		paramQuantities[UB5_PARAM]->snapEnabled = true;
-		configParam(UB6_PARAM, -100.f, 100.f, 0.f, "Upper Bound");
+		configParam(UB6_PARAM, -30.f, 30.f, 0.f, "Upper Bound");
 		paramQuantities[UB6_PARAM]->snapEnabled = true;
-		configParam(UB7_PARAM, -100.f, 100.f, 0.f, "Upper Bound");
+		configParam(UB7_PARAM, -30.f, 30.f, 0.f, "Upper Bound");
 		paramQuantities[UB7_PARAM]->snapEnabled = true;
 
-		configParam(BUT0_PARAM, -100.f, 100.f, 0.f, "Shift");
+		configParam(BUT0_PARAM, -30.f, 30.f, 0.f, "Shift");
 		paramQuantities[BUT0_PARAM]->snapEnabled = true;
-		configParam(BUT1_PARAM, -100.f, 100.f, 0.f, "Shift");
+		configParam(BUT1_PARAM, -30.f, 30.f, 0.f, "Shift");
 		paramQuantities[BUT1_PARAM]->snapEnabled = true;
-		configParam(BUT2_PARAM, -100.f, 100.f, 0.f, "Shift");
+		configParam(BUT2_PARAM, -30.f, 30.f, 0.f, "Shift");
 		paramQuantities[BUT2_PARAM]->snapEnabled = true;
-		configParam(BUT3_PARAM, -100.f, 100.f, 0.f, "Shift");
+		configParam(BUT3_PARAM, -30.f, 30.f, 0.f, "Shift");
 		paramQuantities[BUT3_PARAM]->snapEnabled = true;
-		configParam(BUT4_PARAM, -100.f, 100.f, 0.f, "Shift");
+		configParam(BUT4_PARAM, -30.f, 30.f, 0.f, "Shift");
 		paramQuantities[BUT4_PARAM]->snapEnabled = true;
-		configParam(BUT5_PARAM, -100.f, 100.f, 0.f, "Shift");
+		configParam(BUT5_PARAM, -30.f, 30.f, 0.f, "Shift");
 		paramQuantities[BUT5_PARAM]->snapEnabled = true;
-		configParam(BUT6_PARAM, -100.f, 100.f, 0.f, "Shift");
+		configParam(BUT6_PARAM, -30.f, 30.f, 0.f, "Shift");
 		paramQuantities[BUT6_PARAM]->snapEnabled = true;
-		configParam(BUT7_PARAM, -100.f, 100.f, 0.f, "Shift");
+		configParam(BUT7_PARAM, -30.f, 30.f, 0.f, "Shift");
 		paramQuantities[BUT7_PARAM]->snapEnabled = true;
 		
-		configSwitch(REMAP_PARAM, 0.f, 1.f, 0.f, "Remap keyoboard inputs to tuning circle steps", {"No","Yes"});
+		configSwitch(REMAP_PARAM, 0.f, 1.f, 0.f, "Remap keyboard inputs to tuning circle steps", {"No","Yes"});
 		configParam(REMAPKEYS_PARAM, 1.f, 100.f, 12.f, "Keyboard keys per octave");
 		paramQuantities[REMAPKEYS_PARAM]->snapEnabled = true;
 		
-		configSwitch(GUESS_PARAM, 0.f, 1.f, 1.f, "Guess correct pitch by choosing monzo with smallest harmonic distance", {"No","Yes"});
+		configSwitch(GUESS_PARAM, 0.f, 1.f, 1.f, "Guess correct pitch by choosing monzo with smallest tenney harmonic distance to root", {"No","Yes"});
 		configParam(GUESSBOUND_PARAM, 1.f, 150.f, 50.f, "Pitch bounds for guessing in +-cents");
 		paramQuantities[GUESSBOUND_PARAM]->snapEnabled = true;
-		configSwitch(EUCLID_PARAM, 0.f, 1.f, 0.f, "Harmonic distance of monzo via", {"Tenney harmonic distance","Euclidean harmonic distance"});
+		configSwitch(EUCLID_PARAM, 0.f, 4.f, 0.f, "Harmonic relationship to", {"Root only", "Input order", "Ascending harminic order", "Descending harmonic order"});
 		
 		configSwitch(SPACE_PARAM, 0.f, 1.f, 0.f, "Tuning steps", {"Pitch space","Frequency space"});
 		configSwitch(IMAGE_PARAM, 0.f, 1.f, 0.f, "Tuning circle", {"Circle (1 Octave)", "Spiral (3 Octaves)"});
@@ -274,32 +273,6 @@ struct XLimitJIAutotuner2 : Module {
 	template <typename T>
 	T pow2(const T& a) {
 		return a*a;
-	}
-
-	float tennyDist(const Monzo& a, const Monzo& b) {
-		double dist = 0.0;
-		dist += std::abs((a.x0 - b.x0) * log22);
-		dist += std::abs((a.x1 - b.x1) * log23);
-		dist += std::abs((a.x2 - b.x2) * log25);
-		dist += std::abs((a.x3 - b.x3) * log27);
-		dist += std::abs((a.x4 - b.x4) * log211);
-		dist += std::abs((a.x5 - b.x5) * log213);
-		dist += std::abs((a.x6 - b.x6) * log217);
-		dist += std::abs((a.x7 - b.x7) * log219);
-		return dist; 
-	}
-
-	float euclidDist(const Monzo& a, const Monzo& b) {
-		double dist = 0.0;
-		dist += pow2(a.x0 - b.x0);
-		dist += pow2(a.x1 - b.x1);
-		dist += pow2(a.x2 - b.x2);
-		dist += pow2(a.x3 - b.x3);
-		dist += pow2(a.x4 - b.x4);
-		dist += pow2(a.x5 - b.x5);
-		dist += pow2(a.x6 - b.x6);
-		dist += pow2(a.x7 - b.x7);
-		return std::sqrt(dist); 
 	}
 
 	bool isRemap(){
@@ -529,14 +502,6 @@ struct XLimitJIAutotuner2 : Module {
 		return tenney;
 	}
 	
-	float euclidDist(PrimeExponentMap map) {
-		double euclid = 0.0;		
-		for(auto& pair : map){
-			euclid += std::log2(pair.first) * (pair.second * pair.second);
-		}
-		return std::sqrt(euclid);
-	}
-	
 	void buildVoltageList(){
 		float* hPtr = &(mCurrParams[0]);
 		float* sPtr = &(mCurrParams[8]);
@@ -607,7 +572,6 @@ struct XLimitJIAutotuner2 : Module {
 										auto& x5 = mVoltageList[idx].x5;
 										auto& x6 = mVoltageList[idx].x6;
 										auto& x7 = mVoltageList[idx].x7;
-										auto& euclid = mVoltageList[idx].euclid;
 										auto& tenney = mVoltageList[idx].tenney;
 										
 										x0 = pow2 + i2;
@@ -631,7 +595,6 @@ struct XLimitJIAutotuner2 : Module {
 
 										distMap.clear();
 										distMap = monzoPrimes(mVoltageList[idx]);
-										euclid = euclidDist(distMap);
 										tenney = tenneyDist(distMap);
 									}
 
@@ -672,7 +635,6 @@ struct XLimitJIAutotuner2 : Module {
 		if (vec.empty()) return target;  // Handle empty case
 		
 		auto bounds = params[GUESSBOUND_PARAM].getValue() / 1200.f;
-		bool isEuclid = params[EUCLID_PARAM].getValue() == 1.f;
 
 		auto lower = std::lower_bound(vec.begin(), vec.end(), target - bounds, 
 		[](const Monzo& a, const double& b) { return a.pitch < b; });
@@ -680,17 +642,7 @@ struct XLimitJIAutotuner2 : Module {
 		auto upper = std::lower_bound(vec.begin(), vec.end(), target + bounds, 
 		[](const Monzo& a, const double& b) { return a.pitch < b; });
 
-		auto minValueIt = (isEuclid) 
-    	? std::min_element(lower, upper, [](const Monzo& a, const Monzo& b) {
-			if(a.euclid == b.euclid){
-				return a.tenney < b.tenney;
-			}
-        	return a.euclid < b.euclid;
-    	})
-    	: std::min_element(lower, upper, [](const Monzo& a, const Monzo& b) {
-			if(a.tenney == b.tenney){
-				return a.euclid < b.euclid;
-			}
+		auto minValueIt = std::min_element(lower, upper, [](const Monzo& a, const Monzo& b) {
         	return a.tenney < b.tenney;
     	});
 
@@ -705,9 +657,82 @@ struct XLimitJIAutotuner2 : Module {
 	void updateButtonLights(){		
 		lights[REMAP_LIGHT].setBrightness(params[REMAP_PARAM].getValue() == 1.f);
 		lights[GUESS_LIGHT].setBrightness(params[GUESS_PARAM].getValue() == 1.f);
-		lights[EUCLID_LIGHT].setBrightness(params[EUCLID_PARAM].getValue() == 0.f);
+		//lights[EUCLID_LIGHT].setBrightness(params[EUCLID_PARAM].getValue() == 0.f);
 		lights[SPACE_LIGHT].setBrightness(params[SPACE_PARAM].getValue() == 0.f);
 		lights[IMAGE_LIGHT].setBrightness(params[IMAGE_PARAM].getValue() == 0.f);
+	}
+
+	void processGuess(const ProcessArgs& args) {
+		int channels = std::max(1, inputs[VIN_INPUT].getChannels());
+
+		outputs[VOUT_OUTPUT].setChannels(channels);
+		outputs[VOUTRES_OUTPUT].setChannels(channels);
+		mAnglesUsed.resize(channels);
+
+		double baseVoltage = inputs[VIN_INPUT].getPolyVoltage(0);
+		double harmonicVoltage = 0.0;
+		for (int c = 0; c < channels; c++) {
+			double currVoltage = inputs[VIN_INPUT].getPolyVoltage(c);
+			harmonicVoltage = findClosestGuess(currVoltage - baseVoltage);
+			
+			mAnglesUsed[c] = harmonicVoltage;
+			double vout = clampD(baseVoltage + harmonicVoltage, -10.0, 10.0);
+			float voutF = static_cast<float>(vout);			
+			float voutR = vout - static_cast<double>(voutF);
+			outputs[VOUT_OUTPUT].setVoltage(voutF, c);
+			outputs[VOUTRES_OUTPUT].setVoltage(voutR, c);
+		}
+
+	}
+
+	void processDefault(const ProcessArgs& args) {
+		int channels = std::max(1, inputs[VIN_INPUT].getChannels());
+
+		outputs[VOUT_OUTPUT].setChannels(channels);
+		outputs[VOUTRES_OUTPUT].setChannels(channels);
+		mAnglesUsed.resize(channels);
+
+		double baseVoltage = inputs[VIN_INPUT].getPolyVoltage(0);
+		double harmonicVoltage = 0.0;
+		for (int c = 0; c < channels; c++) {
+			double currVoltage = inputs[VIN_INPUT].getPolyVoltage(c);
+			harmonicVoltage = findClosestInSorted(currVoltage - baseVoltage);			
+			mAnglesUsed[c] = harmonicVoltage;
+			double vout = clampD(baseVoltage + harmonicVoltage, -10.0, 10.0);
+			float voutF = static_cast<float>(vout);			
+			float voutR = vout - static_cast<double>(voutF);
+			outputs[VOUT_OUTPUT].setVoltage(voutF, c);
+			outputs[VOUTRES_OUTPUT].setVoltage(voutR, c);
+		}
+
+	}
+
+	
+	void processRemap(const ProcessArgs& args) {
+		
+		int channels = std::max(1, inputs[VIN_INPUT].getChannels());
+
+		outputs[VOUT_OUTPUT].setChannels(channels);
+		outputs[VOUTRES_OUTPUT].setChannels(channels);
+		mAnglesUsed.resize(channels);
+
+		float keysPerOct = params[REMAPKEYS_PARAM].getValue();
+		double currVoltage = inputs[VIN_INPUT].getPolyVoltage(0);
+		int baseIdx = (int)std::roundf(keysPerOct * currVoltage);
+		int idx = clamp(baseIdx + mVoltageListZeroIdx, 0, mVoltageList.size() - 1);
+		double baseVoltage = mVoltageList[idx].pitch;
+		for (int c = 0; c < channels; c++) {
+			currVoltage = inputs[VIN_INPUT].getPolyVoltage(c);
+			idx = clamp((int)std::roundf(keysPerOct * currVoltage) + mVoltageListZeroIdx - baseIdx, 0, mVoltageList.size() - 1);
+			double harmonicVoltage = mVoltageList[idx].pitch;
+			mAnglesUsed[c] = harmonicVoltage;
+			double vout = clampD(baseVoltage + harmonicVoltage, -10.0, 10.0);
+			float voutF = static_cast<float>(vout);			
+			float voutR = vout - static_cast<double>(voutF);
+			outputs[VOUT_OUTPUT].setVoltage(voutF, c);
+			outputs[VOUTRES_OUTPUT].setVoltage(voutR, c);
+		}
+
 	}
 	
 	void process(const ProcessArgs& args) override {
@@ -721,47 +746,14 @@ struct XLimitJIAutotuner2 : Module {
 			updateHistoricParams();	
 		}
 		
-		int channels = std::max(1, inputs[VIN_INPUT].getChannels());
-
-		outputs[VOUT_OUTPUT].setChannels(channels);
-		outputs[VOUTRES_OUTPUT].setChannels(channels);
-		mAnglesUsed.resize(channels);
-
-		if(isRemap()){
-			float keysPerOct = params[REMAPKEYS_PARAM].getValue();
-			double currVoltage = inputs[VIN_INPUT].getPolyVoltage(0);
-			int baseIdx = (int)std::roundf(keysPerOct * currVoltage);
-			int idx = clamp(baseIdx + mVoltageListZeroIdx, 0, mVoltageList.size() - 1);
-			double baseVoltage = mVoltageList[idx].pitch;
-			for (int c = 0; c < channels; c++) {
-				currVoltage = inputs[VIN_INPUT].getPolyVoltage(c);
-				idx = clamp((int)std::roundf(keysPerOct * currVoltage) + mVoltageListZeroIdx - baseIdx, 0, mVoltageList.size() - 1);
-				double harmonicVoltage = mVoltageList[idx].pitch;
-				mAnglesUsed[c] = harmonicVoltage;
-				double vout = clampD(baseVoltage + harmonicVoltage, -10.0, 10.0);
-				float voutF = static_cast<float>(vout);			
-				float voutR = vout - static_cast<double>(voutF);
-				outputs[VOUT_OUTPUT].setVoltage(voutF, c);
-				outputs[VOUTRES_OUTPUT].setVoltage(voutR, c);
-			}			
+		if(isRemap()) {
+			processRemap(args);		
 		} 
+		else if(isGuess()) {
+			processGuess(args);
+		}
 		else {
-			double baseVoltage = inputs[VIN_INPUT].getPolyVoltage(0);
-			double harmonicVoltage = 0.0;
-			for (int c = 0; c < channels; c++) {
-				double currVoltage = inputs[VIN_INPUT].getPolyVoltage(c);
-				if(isGuess()) {
-					harmonicVoltage = findClosestGuess(currVoltage - baseVoltage);
-				} else {
-					harmonicVoltage = findClosestInSorted(currVoltage - baseVoltage);
-				}
-				mAnglesUsed[c] = harmonicVoltage;
-				double vout = clampD(baseVoltage + harmonicVoltage, -10.0, 10.0);
-				float voutF = static_cast<float>(vout);			
-				float voutR = vout - static_cast<double>(voutF);
-				outputs[VOUT_OUTPUT].setVoltage(voutF, c);
-				outputs[VOUTRES_OUTPUT].setVoltage(voutR, c);
-			}
+			processDefault(args);
 		}
 	
 	}
